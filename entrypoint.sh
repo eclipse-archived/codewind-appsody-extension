@@ -72,9 +72,10 @@ source /file-watcher/scripts/constants.sh
 echo project=$project
 cd "$ROOT"
 
-# Export some APPSODY env vars
 hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
-export APPSODY_MOUNT_HOME="$hostWorkspacePath/.extensions/appsodyExtension"
+
+# Export some APPSODY env vars
+export APPSODY_MOUNT_HOME=`/codewind-workspace/.extensions/appsodyExtension/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
 export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/appsodyExtension/bin/appsody-controller"
 export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
 
