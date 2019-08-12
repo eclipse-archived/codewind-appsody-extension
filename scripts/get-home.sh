@@ -12,11 +12,11 @@
 #
 ###################################################################################
 
-b="(.*\s)?" # beginning arguments
-e="(\s.*)?" # ending arguments
+b="(.*\s)?"	# beginning arguments
+e="(\s.*)?"	# ending arguments
 
 q="['\"]?"	# optional single or double quote
-s="[/\\]" 	# path separator 
+s="[/\\]"	# path separator 
 
 regex="^${b}-Dmaven\.repo\.local=${q}(.*)${s}.m2${s}repository${s}?${q}${e}$"
 
