@@ -1,0 +1,8 @@
+name: appsodyExtension
+version: 0.3.0
+description: Appsody extension for Codewind
+projectType: appsodyExtension
+commands: []
+detection: .appsody-config.yaml
+config:
+  containerAppRoot: /project/user-app
