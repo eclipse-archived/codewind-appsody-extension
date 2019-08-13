@@ -1,0 +1,3 @@
+home: /codewind-workspace/.appsody
+images: index.docker.io
+tektonserver: ""
