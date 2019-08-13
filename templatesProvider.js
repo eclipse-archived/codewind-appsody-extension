@@ -22,7 +22,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
 
             // list of repositories start on 3rd line
-            exec('/codewind-workspace/.extensions/appsodyExtension/appsody repo list | tail -n+3', (err, stdout) => {
+            exec(`${__dirname}/appsody repo list | tail -n+3`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
