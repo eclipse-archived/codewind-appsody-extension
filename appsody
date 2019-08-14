@@ -12,4 +12,6 @@
 #
 ###################################################################################
 
-/codewind-workspace/.extensions/appsodyExtension/bin/appsody $@ --config /codewind-workspace/.extensions/appsodyExtension/.appsody.yaml
+DIR=`dirname $0`
+
+$DIR/bin/appsody $@ --config $DIR/.appsody.yaml

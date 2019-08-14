@@ -12,6 +12,9 @@
 #
 ###################################################################################
 
+DIR=`dirname $0`
+EXT_NAME=`basename $DIR`
+
 ROOT=$1
 LOCAL_WORKSPACE=$2
 PROJECT_ID=$3
@@ -75,8 +78,8 @@ cd "$ROOT"
 hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
 
 # Export some APPSODY env vars
-export APPSODY_MOUNT_HOME=`/codewind-workspace/.extensions/appsodyExtension/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
-export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/appsodyExtension/bin/appsody-controller"
+export APPSODY_MOUNT_HOME=`$DIR/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
+export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/$EXT_NAME/bin/appsody-controller"
 export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
 
 echo APPSODY_MOUNT_HOME=$APPSODY_MOUNT_HOME
@@ -303,7 +306,7 @@ function create() {
 # }
 
 function appsodyStop() {
-	/codewind-workspace/.extensions/appsodyExtension/appsody stop --name $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
+	$DIR/appsody stop --name $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
 }
 
 function appsodyStart() {
@@ -314,8 +317,8 @@ function appsodyStart() {
 		cmd=debug
 	fi
 
-	/codewind-workspace/.extensions/appsodyExtension/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P |& tee -a $LOG_FOLDER/appsody.log &
-	/codewind-workspace/.extensions/appsodyExtension/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
+	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P |& tee -a $LOG_FOLDER/appsody.log &
+	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
 }
 
 function deployLocal() {
@@ -334,7 +337,7 @@ function deployLocal() {
 	$util newLogFileAvailable $PROJECT_ID "app"
 
 	echo "Run appsody init"
-	/codewind-workspace/.extensions/appsodyExtension/appsody init |& tee -a $LOG_FOLDER/appsody.log
+	$DIR/appsody init |& tee -a $LOG_FOLDER/appsody.log
 
 	echo "Run appsody"
 	appsodyStart
@@ -502,6 +505,6 @@ elif [ "$COMMAND" == "rebuild" ]; then
 	create
 # Just return configuration information as last line of output
 else
-	knStack=`/codewind-workspace/.extensions/appsodyExtension/scripts/get-stack.sh .appsody-config.yaml`
+	knStack=`$DIR/scripts/get-stack.sh .appsody-config.yaml`
 	echo -n "{ \"language\": \"$knStack\" }"
 fi
