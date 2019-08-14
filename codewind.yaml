@@ -1,4 +1,4 @@
-name: codewind-appsody-extension
+name: appsodyExtension
 version: 0.3.0
 description: Appsody extension for Codewind
 projectType: appsodyExtension
