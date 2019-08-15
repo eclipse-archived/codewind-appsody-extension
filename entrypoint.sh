@@ -321,16 +321,20 @@ function appsodyStart() {
 	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
 }
 
-function deployLocal() {
-	
-	echo "Appsody deploy for $projectName"
-
+function resetStates() {
 	# appsody projects don't really need to "build"
 	# $util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
 	imageLastBuild=$(($(date +%s)*1000))
 	$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
 
 	$util updateAppState $PROJECT_ID $APP_STATE_STARTING
+}
+
+function deployLocal() {
+	
+	echo "Appsody deploy for $projectName"
+
+	resetStates
 
 	echo "Triggering log file event for: appsody app log"
 	echo "Appsody app log file $LOG_FOLDER/appsody.log"
@@ -409,30 +413,30 @@ elif [ "$COMMAND" == "update" ]; then
 		echo "Rebuilding project: $projectName"
 		cleanContainer
 		create
-	elif [ "$action" == "RESTART" ]; then
+	# elif [ "$action" == "RESTART" ]; then
 	# 	if [ "$IN_K8" == "true" ]; then
 	# 		# Currently in ICP, changed files are only copied over through docker build
 	# 		echo "Rebuilding project: $projectName"
 	# 		create
 	# 	else
-			echo "Restarting project: $projectName"
-			appsodyStop
-			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-			appsodyStart
-			$util updateAppState $PROJECT_ID $APP_STATE_STARTING
+	# 		echo "Restarting node/nodemon for changed config file"
+	# 		$IMAGE_COMMAND exec $project /scripts/noderun.sh stop
+	# 		$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
+
+	# 		$IMAGE_COMMAND exec $project /scripts/noderun.sh start $AUTO_BUILD_ENABLED $START_MODE $HOST_OS
+	# 		$util updateAppState $PROJECT_ID $APP_STATE_STARTING
 	# 	fi
-	# else
+	else
 	# 	if [ "$IN_K8" == "true" ]; then
 	# 		# No nodemon in ICP and changed files are only copied over through docker build
 	# 		echo "Rebuilding project: $projectName"
 	# 		create
 	# 	elif [ "$AUTO_BUILD_ENABLED" != "true" ]; then
-	# 		# If auto build disabled then not using nodemon and need to restart
-	# 		echo "Restarting node for changed file"
-	# 		docker exec $project /scripts/noderun.sh stop
-	# 		$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-	# 		docker exec $project /scripts/noderun.sh start $AUTO_BUILD_ENABLED $START_MODE
-	# 		$util updateAppState $PROJECT_ID $APP_STATE_STARTING
+			echo "Restarting project: $projectName"
+			appsodyStop
+			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
+			resetStates
+			appsodyStart
 	# 	fi
 	fi
 
@@ -446,8 +450,8 @@ elif [ "$COMMAND" == "start" ]; then
 	echo "Starting appsody project $projectName"
 	# Clear the cache since restarting node will pick up any changes to package.json or nodemon.json
 	# clearNodeCache
+	resetStates
 	appsodyStart
-	$util updateAppState $PROJECT_ID $APP_STATE_STARTING
 # Enable auto build
 elif [ "$COMMAND" == "enableautobuild" ]; then
 	echo "Enabling auto build for appsody project $projectName"
