@@ -21,7 +21,9 @@ s="[/\\]"	# path separator
 regex="^${b}-Dmaven\.repo\.local=${q}(.*)${s}.m2${s}repository${s}?${q}${e}$"
 
 if [[ $HOST_MAVEN_OPTS =~ $regex ]]; then
-	echo ${BASH_REMATCH[2]//\\/\\\\}
+	home=${BASH_REMATCH[2]}
 else
-	echo $HOST_HOME
+	home=${HOST_HOME}
 fi
+
+echo ${home//\\/\\\\}
