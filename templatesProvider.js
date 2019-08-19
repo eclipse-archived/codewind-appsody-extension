@@ -35,10 +35,10 @@ module.exports = {
                     const pair = line.trim().split(/\s+/);
                     
                     // appsody uses index.yaml, change that to index.json
-                    if (pair.length >= 2 && pair[1].endsWith('/index.yaml')) {
+                    if (pair.length >= 2 && pair[1].endsWith('index.yaml')) {
 
                         let url = pair[1];
-                        url = url.substring(0, url.length - 10) + 'devfiles/index.json';
+                        url = url.substring(0, url.length - 10) + 'index.json';
 
                         repos.push({
                             description: pair[0],
