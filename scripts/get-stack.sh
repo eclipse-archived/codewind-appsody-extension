@@ -20,4 +20,6 @@ elif grep --quiet "java" $1; then
 	echo java
 elif grep --quiet "swift" $1; then
 	echo swift
+elif grep --quiet "quarkus" $1; then
+	echo quarkus
 fi
