@@ -20,6 +20,8 @@ elif grep --quiet "nodejs" $1; then
 	echo nodejs
 elif grep --quiet "java-microprofile" $1; then
 	echo java-microprofile
+elif grep --quiet "java-spring-boot2-liberty" $1; then
+	echo java-spring-boot2-liberty
 elif grep --quiet "java-spring-boot2" $1; then
 	echo java-spring-boot2
 elif grep --quiet "swift" $1; then
