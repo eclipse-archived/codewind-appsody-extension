@@ -14,6 +14,8 @@
 
 if grep --quiet "nodejs-express" $1; then
 	echo nodejs-express
+elif grep --quiet "nodejs-loopback" $1; then
+	echo nodejs-loopback
 elif grep --quiet "nodejs" $1; then
 	echo nodejs
 elif grep --quiet "java-microprofile" $1; then
