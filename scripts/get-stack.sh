@@ -12,18 +12,12 @@
 #
 ###################################################################################
 
-if grep --quiet "nodejs-express" $1; then
-	echo nodejs-express
-elif grep --quiet "nodejs-loopback" $1; then
-	echo nodejs-loopback
-elif grep --quiet "nodejs" $1; then
+if grep --quiet "nodejs" $1; then
 	echo nodejs
-elif grep --quiet "java-microprofile" $1; then
-	echo java-microprofile
-elif grep --quiet "java-spring-boot2-liberty" $1; then
-	echo java-spring-boot2-liberty
 elif grep --quiet "java-spring-boot2" $1; then
 	echo java-spring-boot2
+elif grep --quiet "java" $1; then
+	echo java
 elif grep --quiet "swift" $1; then
 	echo swift
 fi
