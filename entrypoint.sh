@@ -73,7 +73,7 @@ util=/file-watcher/scripts/util.sh
 source /file-watcher/scripts/constants.sh
 
 echo project=$project
-cd "$ROOT"
+cd "$ROOT" 2> /dev/null
 
 hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
 
