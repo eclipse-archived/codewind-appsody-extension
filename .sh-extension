@@ -6,13 +6,13 @@
     ],
     "appPort": {
         "nodejs-default": "3000",
-        "java-spring": "8080",
-        "java-default": "9080"
+        "java-default": "9080",
+        "java-spring": "8080"
     },
     "debugPort": {
         "nodejs-default": "9229",
-        "java-spring": "5005",
-        "java-default": "7777"
+        "java-default": "7777",
+        "java-spring": "5005"
     },
     "capabilities": {
         "startModes": [ 
