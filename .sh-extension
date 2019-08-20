@@ -7,12 +7,14 @@
     "appPort": {
         "nodejs": "3000",
         "java-spring-boot2": "8080",
-        "java": "9080"
+        "java": "9080",
+        "quarkus": "8080"
     },
     "debugPort": {
         "nodejs": "9229",
         "java-spring-boot2": "5005",
-        "java": "7777"
+        "java": "7777",
+        "quarkus": "5005"
     },
     "capabilities": {
         "startModes": [ 
