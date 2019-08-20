@@ -14,7 +14,9 @@
 
 if grep --quiet "nodejs" $1; then
 	echo nodejs-default
-elif grep --quiet "java-spring-boot2:" $1; then
+elif grep --quiet "liberty" $1; then
+	echo java-default
+elif grep --quiet "spring" $1; then
 	echo java-spring
 elif grep --quiet "quarkus" $1; then
 	echo java-spring
