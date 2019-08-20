@@ -13,13 +13,11 @@
 ###################################################################################
 
 if grep --quiet "nodejs" $1; then
-	echo nodejs
-elif grep --quiet "java-spring-boot2" $1; then
-	echo java-spring-boot2
-elif grep --quiet "java" $1; then
-	echo java
-elif grep --quiet "swift" $1; then
-	echo swift
+	echo nodejs-default
+elif grep --quiet "java-spring-boot2:" $1; then
+	echo java-spring
 elif grep --quiet "quarkus" $1; then
-	echo quarkus
+	echo java-spring
+elif grep --quiet "java" $1; then
+	echo java-default
 fi

@@ -5,16 +5,14 @@
         "appsody"
     ],
     "appPort": {
-        "nodejs": "3000",
-        "java-spring-boot2": "8080",
-        "java": "9080",
-        "quarkus": "8080"
+        "nodejs-default": "3000",
+        "java-spring": "8080",
+        "java-default": "9080"
     },
     "debugPort": {
-        "nodejs": "9229",
-        "java-spring-boot2": "5005",
-        "java": "7777",
-        "quarkus": "5005"
+        "nodejs-default": "9229",
+        "java-spring": "5005",
+        "java-default": "7777"
     },
     "capabilities": {
         "startModes": [ 
