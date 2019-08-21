@@ -21,6 +21,10 @@ module.exports = {
     getRepositories: async function() {
         return new Promise((resolve, reject) => {
 
+            // not support on k8s at the moment, return empty list
+            if (global.codewind && global.codewind.RUNNING_IN_K8S)
+                return resolve([]);
+
             // list of repositories start on 3rd line
             exec(`${__dirname}/appsody repo list | tail -n+3`, (err, stdout) => {
 
@@ -35,7 +39,7 @@ module.exports = {
                     const pair = line.trim().split(/\s+/);
                     
                     // appsody uses index.yaml, change that to index.json
-                    if (pair.length >= 2 && pair[1].endsWith('index.yaml')) {
+                    if (pair.length >= 2 && pair[0] != 'experimental' && pair[1].endsWith('index.yaml')) {
 
                         let url = pair[1];
                         url = url.substring(0, url.length - 10) + 'index.json';
