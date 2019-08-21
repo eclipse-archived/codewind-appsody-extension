@@ -413,18 +413,17 @@ elif [ "$COMMAND" == "update" ]; then
 		echo "Rebuilding project: $projectName"
 		cleanContainer
 		create
-	# elif [ "$action" == "RESTART" ]; then
+	elif [ "$action" == "RESTART" ]; then
 	# 	if [ "$IN_K8" == "true" ]; then
 	# 		# Currently in ICP, changed files are only copied over through docker build
 	# 		echo "Rebuilding project: $projectName"
 	# 		create
 	# 	else
-	# 		echo "Restarting node/nodemon for changed config file"
-	# 		$IMAGE_COMMAND exec $project /scripts/noderun.sh stop
-	# 		$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-
-	# 		$IMAGE_COMMAND exec $project /scripts/noderun.sh start $AUTO_BUILD_ENABLED $START_MODE $HOST_OS
-	# 		$util updateAppState $PROJECT_ID $APP_STATE_STARTING
+			echo "Restarting project: $projectName"
+			appsodyStop
+			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
+			resetStates
+			appsodyStart
 	# 	fi
 	else
 	# 	if [ "$IN_K8" == "true" ]; then
@@ -432,11 +431,11 @@ elif [ "$COMMAND" == "update" ]; then
 	# 		echo "Rebuilding project: $projectName"
 	# 		create
 	# 	elif [ "$AUTO_BUILD_ENABLED" != "true" ]; then
-			echo "Restarting project: $projectName"
-			appsodyStop
-			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
+			# echo "Restarting project: $projectName"
+			# appsodyStop
+			# $util updateAppState $PROJECT_ID $APP_STATE_STOPPING
 			resetStates
-			appsodyStart
+			# appsodyStart
 	# 	fi
 	fi
 
