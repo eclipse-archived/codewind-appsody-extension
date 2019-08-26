@@ -5,9 +5,6 @@
 
 This repository is an extension to Codewind that adds support for [Appsody](https://appsody.dev) projects.
 
-- Appsody version: [0.3.0](https://github.com/appsody/appsody/releases/tag/0.3.0)
-- Appsody controller version: [0.2.2](https://github.com/appsody/controller/releases/tag/0.2.2)
-
 ## Installing the Appsody Extension on Codewind
 
 Download the latest [release](https://github.com/eclipse/codewind-appsody-extension/releases) and unzip or untar it under the Codewind workspace's `.extensions` folder, i.e.
@@ -57,5 +54,5 @@ If you have a local install of the Appsody CLI, you can configure it to use the 
 
 Submit issues and contributions:
 
-1. [Submitting issues](https://github.com/eclipse/codewind-appsody-extension/issues)
+1. [Submitting issues](https://github.com/eclipse/codewind/issues)
 2. [Contributing](CONTRIBUTING.md)
