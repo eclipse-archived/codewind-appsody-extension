@@ -13,4 +13,4 @@ This repository is not used for issue tracking of the Codewind Appsody extension
 
 🚨 Please don't submit new issues here. 🚨
 
-All issues for the Eclipse Codewind plugin for Che are managed at [https://github.com/eclipse/codewind/issues](https://github.com/eclipse/codewind/issues).
+All issues for the Eclipse Codewind Appsody extension are managed at [https://github.com/eclipse/codewind/issues](https://github.com/eclipse/codewind/issues).
