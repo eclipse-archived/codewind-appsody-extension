@@ -89,13 +89,13 @@ echo APPSODY_MOUNT_PROJECT=$APPSODY_MOUNT_PROJECT
 set -o pipefail
 
 function cleanContainer() {
-	if [ "$IN_K8" != "true" ]; then
+	# if [ "$IN_K8" != "true" ]; then
 		if [ "$(docker ps -aq -f name=$project)" ]; then
 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
 			docker rm -f $project
 			docker rmi -f $project
 		fi
-	fi
+	# fi
 }
 
 function create() {
@@ -473,12 +473,12 @@ elif [ "$COMMAND" == "disableautobuild" ]; then
 elif [ "$COMMAND" == "remove" ]; then
 	echo "Removing the container for app $ROOT."
 
-	if [ "$IN_K8" == "true" ]; then
-		helm delete $project --purge
-		if [[ "$(kubectl get images $CONTAINER_NAME)" ]]; then
-			kubectl delete image $CONTAINER_NAME --force --grace-period=0
-		fi
-	else
+	# if [ "$IN_K8" == "true" ]; then
+	# 	helm delete $project --purge
+	# 	if [[ "$(kubectl get images $CONTAINER_NAME)" ]]; then
+	# 		kubectl delete image $CONTAINER_NAME --force --grace-period=0
+	# 	fi
+	# else
 		# Remove container
 		docker rm -f $project
 
@@ -486,7 +486,7 @@ elif [ "$COMMAND" == "remove" ]; then
 		if [ "$(docker volume ls -q -f name=$project-nodemodules)" ]; then
 			docker volume rm $project-nodemodules
 		fi
-	fi
+	# fi
 
 	# Remove image
 	if [ "$(docker images -qa -f reference=$project)" ]; then
@@ -496,11 +496,11 @@ elif [ "$COMMAND" == "remove" ]; then
 	fi
 
 	# Remove registry image and Kubernetes image
-	if [ "$IN_K8" == "true" ]; then
-		if [ "$( docker images -q $DEPLOYMENT_REGISTRY/$project )" ]; then
-			docker rmi -f $DEPLOYMENT_REGISTRY/$project
-		fi
-	fi
+	# if [ "$IN_K8" == "true" ]; then
+	# 	if [ "$( docker images -q $DEPLOYMENT_REGISTRY/$project )" ]; then
+	# 		docker rmi -f $DEPLOYMENT_REGISTRY/$project
+	# 	fi
+	# fi
 # Rebuild the application
 elif [ "$COMMAND" == "rebuild" ]; then
 	echo "Rebuilding project: $projectName"
