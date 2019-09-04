@@ -7,7 +7,8 @@
     "appPort": {
         "nodejs-default": "3000",
         "java-default": "9080",
-        "java-spring": "8080"
+        "java-spring": "8080",
+        "python-default": "8080"
     },
     "debugPort": {
         "nodejs-default": "9229",
