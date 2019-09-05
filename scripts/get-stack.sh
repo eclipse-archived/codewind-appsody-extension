@@ -22,4 +22,6 @@ elif grep --quiet "quarkus" $1; then
 	echo java-spring
 elif grep --quiet "java" $1; then
 	echo java-default
+elif grep --quiet "python" $1; then
+	echo python-default
 fi
