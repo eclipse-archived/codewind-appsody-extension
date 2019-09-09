@@ -39,15 +39,24 @@ module.exports = {
                     const pair = line.trim().split(/\s+/);
                     
                     // appsody uses index.yaml, change that to index.json
-                    if (pair.length >= 2 && pair[0] != 'experimental' && pair[1].endsWith('index.yaml')) {
+                    if (pair.length >= 2) {
+                    
+                        let name = pair[0];
 
-                        let url = pair[1];
-                        url = url.substring(0, url.length - 10) + 'index.json';
+                        // chop of the default repo indicator if present
+                        if (name.startsWith('*'))
+                            name = name.substring(1);
 
-                        repos.push({
-                            description: pair[0],
-                            url: url
-                        });
+                        if (name != 'experimental' && pair[1].endsWith('index.yaml')) {
+
+                            let url = pair[1];
+                            url = url.substring(0, url.length - 10) + 'index.json';
+
+                            repos.push({
+                                description: `Appsody Stacks - ${name}`,
+                                url: url
+                            });
+                        }
                     }
                 });
 
