@@ -340,9 +340,6 @@ function deployLocal() {
 	echo "Appsody app log file $LOG_FOLDER/appsody.log"
 	$util newLogFileAvailable $PROJECT_ID "app"
 
-	echo "Run appsody init"
-	$DIR/appsody init |& tee -a $LOG_FOLDER/appsody.log
-
 	echo "Run appsody"
 	appsodyStart
 }
