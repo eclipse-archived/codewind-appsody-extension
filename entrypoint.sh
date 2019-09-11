@@ -78,7 +78,7 @@ cd "$ROOT" 2> /dev/null
 hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
 
 # Export some APPSODY env vars
-export APPSODY_MOUNT_HOME=`$DIR/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
+# export APPSODY_MOUNT_HOME=`$DIR/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
 export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/$EXT_NAME/bin/appsody-controller"
 export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
 
