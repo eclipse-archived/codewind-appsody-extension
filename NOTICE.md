@@ -2,7 +2,7 @@
 
 This content is produced and maintained by the Eclipse Codewind project.
 
- * Project home: 
+ * Project home: https://www.eclipse.org/codewind/
 
 ## Trademarks
 
@@ -22,23 +22,24 @@ This program and the accompanying materials are made available under the terms
 of the Eclipse Public License v. 2.0 which is available at
 http://www.eclipse.org/legal/epl-v20.html.
 
-SPDX-License-Identifier: EPL-1.2
+SPDX-License-Identifier: EPL-2.0
 
 ## Source Code
 
 The project maintains the following source code repositories:
 
  * https://github.com/eclipse/codewind
- * https://github.com/eclipse/codewind-eclipse
- * https://github.com/eclipse/codewind-vscode
+ * https://github.com/eclipse/codewind-appsody-extension
  * https://github.com/eclipse/codewind-che-plugin
- * https://github.com/eclipse/codewind-installer
- * https://github.com/eclipse/codewind-openapi-vscode
- * https://github.com/eclipse/codewind-filewatchers
- * https://github.com/eclipse/codewind-openapi-eclipse
  * https://github.com/eclipse/codewind-docs
+ * https://github.com/eclipse/codewind-eclipse
+ * https://github.com/eclipse/codewind-filewatchers
+ * https://github.com/eclipse/codewind-installer
  * https://github.com/eclipse/codewind-java-profiler
  * https://github.com/eclipse/codewind-node-profiler
+ * https://github.com/eclipse/codewind-openapi-eclipse
+ * https://github.com/eclipse/codewind-openapi-vscode
+ * https://github.com/eclipse/codewind-vscode
 
 ## Third-party Content
 
