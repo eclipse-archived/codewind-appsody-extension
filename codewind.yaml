@@ -2,7 +2,9 @@ name: appsodyExtension
 version: 0.4.0
 description: Appsody extension for Codewind
 projectType: appsodyExtension
-commands: []
+commands:
+  - name: postProjectValidate
+    command: "appsody init"
 detection: .appsody-config.yaml
 config:
   containerAppRoot: /project/user-app
