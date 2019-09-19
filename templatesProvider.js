@@ -63,5 +63,29 @@ module.exports = {
                 resolve(repos);
             });
         });
+    },
+
+    getSubtypes: async function() {
+        return new Promise((resolve, reject) => {
+
+            // not support on k8s at the moment, return empty list
+            if (global.codewind && global.codewind.RUNNING_IN_K8S)
+                return resolve([]);
+
+            // list of stacks start on 3rd line
+            exec(`${__dirname}/appsody list | tail -n+3`, (err, stdout) => {
+
+                if (err)
+                    return reject(err);
+
+                const stacks = [];
+
+                stdout.split(os.EOL).forEach((line) => {
+                    // TODO process the line
+                });
+
+                resolve(stacks);
+            });
+        });
     }
 }
