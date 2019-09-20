@@ -68,10 +68,6 @@ module.exports = {
     getSubtypes: async function() {
         return new Promise((resolve, reject) => {
 
-            // not support on k8s at the moment, return empty list
-            if (global.codewind && global.codewind.RUNNING_IN_K8S)
-                return resolve([]);
-
             // list of stacks start on 3rd line
             exec(`${__dirname}/appsody list | tail -n+3`, (err, stdout) => {
 
@@ -79,12 +75,42 @@ module.exports = {
                     return reject(err);
 
                 const stacks = [];
+                let descStart;
 
-                stdout.split(os.EOL).forEach((line) => {
-                    // TODO process the line
+                for (const line of stdout.split(os.EOL)) {
+                    
+                    // found header line, note where the description starts
+                    if (line.startsWith('REPO')) {
+                        descStart = line.indexOf('DESCRIPTION');
+                        continue;
+                    }
+
+                    // haven't found the header line yet
+                    if (!descStart)
+                        continue;
+
+                    // split the line: <repo> <id> <version> <templates> (leave <description> for later)
+                    const cols = line.substring(0, descStart).split(/\s+/);
+
+                    // check if it's a valid, non-experimental entry
+                    if (cols.length < 4 || cols[0] == 'experimental')
+                        continue;
+
+                    const stack = cols[1];
+                    const version = cols[2];
+
+                    stacks.push({
+                        id: `${cols[0]}/${stack}`,
+                        version,
+                        label: `${stack}:${version}`,
+                        description: line.substring(descStart).trimRight()
+                    });
+                }
+
+                resolve({
+                    prompt: 'Select the Appsody stack',
+                    items: stacks
                 });
-
-                resolve(stacks);
             });
         });
     }
