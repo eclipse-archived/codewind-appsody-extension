@@ -91,16 +91,17 @@ module.exports = {
 
                     // split the line: <repo> <id> <version> <templates> (leave <description> for later)
                     const cols = line.substring(0, descStart).split(/\s+/);
+                    const repo = cols[0];
 
                     // check if it's a valid, non-experimental entry
-                    if (cols.length < 4 || cols[0] == 'experimental')
+                    if (cols.length < 4 || repo == 'experimental')
                         continue;
 
                     const stack = cols[1];
                     const version = cols[2];
 
                     stacks.push({
-                        id: `${cols[0]}/${stack}`,
+                        id: `${repo}/${stack}`,
                         version,
                         label: `${stack}:${version}`,
                         description: line.substring(descStart).trimRight()
