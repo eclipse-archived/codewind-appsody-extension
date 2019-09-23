@@ -98,12 +98,11 @@ module.exports = {
                         continue;
 
                     const stack = cols[1];
-                    const version = cols[2];
 
                     stacks.push({
                         id: `${repo}/${stack}`,
-                        version,
-                        label: `${stack}:${version}`,
+                        version: cols[2],
+                        label: stack,
                         description: line.substring(descStart).trimRight()
                     });
                 }
