@@ -65,7 +65,7 @@ module.exports = {
         });
     },
 
-    getSubtypes: async function() {
+    getProjectTypes: async function() {
         return new Promise((resolve, reject) => {
 
             // list of stacks start on 3rd line
@@ -74,7 +74,7 @@ module.exports = {
                 if (err)
                     return reject(err);
 
-                const stacks = [];
+                const projectTypes = [];
                 let descStart;
 
                 for (const line of stdout.split(os.EOL)) {
@@ -99,18 +99,21 @@ module.exports = {
 
                     const stack = cols[1];
 
-                    stacks.push({
-                        id: `${repo}/${stack}`,
-                        version: cols[2],
-                        label: stack,
-                        description: line.substring(descStart).trimRight()
+                    projectTypes.push({
+                        projectType: 'appsodyExtension',
+                        projectSubtypes: {
+                            prompt: 'Select the Appsody stack',
+                            items: [{
+                                id: `${repo}/${stack}`,
+                                version: cols[2],
+                                label: `Appsody ${stack}`,
+                                description: line.substring(descStart).trimRight()
+                            }]
+                        }
                     });
                 }
 
-                resolve({
-                    prompt: 'Select the Appsody stack',
-                    items: stacks
-                });
+                resolve(projectTypes);
             });
         });
     }
