@@ -53,6 +53,7 @@ module.exports = {
                             url = url.substring(0, url.length - 10) + 'index.json';
 
                             repos.push({
+                                name,
                                 description: `Appsody Stacks - ${name}`,
                                 url: url
                             });
