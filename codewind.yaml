@@ -7,6 +7,12 @@ commands:
     command: appsody
     args:
       - init
+  - name: postProjectValidateWithType
+    command: appsody
+    args:
+      - init
+      - <subtype>
+      - none
 detection: .appsody-config.yaml
 config:
   containerAppRoot: /project/user-app
