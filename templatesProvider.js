@@ -102,7 +102,7 @@ module.exports = {
                     projectTypes.push({
                         projectType: 'appsodyExtension',
                         projectSubtypes: {
-                            prompt: 'Select the Appsody stack',
+                            label: 'Appsody stack',
                             items: [{
                                 id: `${repo}/${stack}`,
                                 version: cols[2],
