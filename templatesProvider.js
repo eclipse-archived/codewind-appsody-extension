@@ -54,7 +54,7 @@ module.exports = {
 
                             repos.push({
                                 name: `Appsody Stacks - ${name}`,
-                                descritpion: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
+                                description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
                                 url: url
                             });
                         }
