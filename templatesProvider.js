@@ -53,8 +53,8 @@ module.exports = {
                             url = url.substring(0, url.length - 10) + 'index.json';
 
                             repos.push({
-                                name,
-                                description: `Appsody Stacks - ${name}`,
+                                name: `Appsody Stacks - ${name}`,
+                                descritpion: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
                                 url: url
                             });
                         }
