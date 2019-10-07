@@ -1,5 +1,5 @@
 home: /codewind-workspace/.appsody
 images: index.docker.io
-lastversioncheck: none
+lastversioncheck: 2019-10-07 15:59:14 +0000 UTC
 operator: https://github.com/appsody/appsody-operator/releases/latest/download
 tektonserver: ""
