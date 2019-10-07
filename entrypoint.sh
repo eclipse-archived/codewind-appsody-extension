@@ -30,7 +30,7 @@ DEPLOYMENT_REGISTRY=${12}
 
 WORKSPACE=/codewind-workspace
 
-DOCKER_BUILD=docker.build
+# DOCKER_BUILD=docker.build
 APP_LOG=app
 
 LOG_FOLDER=$WORKSPACE/.logs/$FOLDER_NAME
@@ -88,12 +88,37 @@ echo APPSODY_MOUNT_PROJECT=$APPSODY_MOUNT_PROJECT
 
 set -o pipefail
 
+function appsodyStop() {
+	$DIR/appsody stop --name $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
+}
+
+function appsodyStart() {
+
+	cmd=$START_MODE
+
+	if [ "$START_MODE" != "run" ]; then
+		cmd=debug
+	fi
+
+	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P |& tee -a $LOG_FOLDER/appsody.log &
+	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
+}
+
+function resetStates() {
+	# appsody projects don't really need to "build"
+	# $util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
+	imageLastBuild=$(($(date +%s)*1000))
+	$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
+
+	$util updateAppState $PROJECT_ID $APP_STATE_STARTING
+}
+
 function cleanContainer() {
 	# if [ "$IN_K8" != "true" ]; then
-		if [ "$(docker ps -aq -f name=$project)" ]; then
+		if [ "$($IMAGE_COMMAND ps -aq -f name=$project)" ]; then
 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-			docker rm -f $project
-			docker rmi -f $project
+			$IMAGE_COMMAND rm -f $project
+			$IMAGE_COMMAND rmi -f $project
 		fi
 	# fi
 }
@@ -116,7 +141,7 @@ function create() {
 # 		if [[ ! -d "$chartDir" ]]; then
 # 			echo "Exiting, Unable to find the Helm chart for project $projectName"
 # 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.noHelmChart"
-# 			exit 1;
+# 			exit 3
 # 		fi
 # 	fi
 # 	chartName=$( basename $chartDir )
@@ -136,7 +161,7 @@ function create() {
 # 	# Render the template yamls for the chart
 # 	helm template $tmpChart \
 # 		--name $project \
-# 		--values=/file-watcher/scripts/override-values-icp.yaml \
+# 		--values=/file-watcher/scripts/override-values.yaml \
 # 		--set image.repository=$DEPLOYMENT_REGISTRY/$project \
 # 		--output-dir=$parentDir
 
@@ -144,13 +169,13 @@ function create() {
 # 	if [[ -z $deploymentFile ]]; then
 # 		echo "Error, unable to find a deployment file in the Helm chart."
 # 		$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.noDeployment"
-# 		exit 1
+# 		exit 3
 # 	fi
 # 	serviceFile=$( /file-watcher/scripts/kubeScripts/find-kube-resource.sh $tmpChart Service )
 # 	if [[ -z $serviceFile ]]; then
 # 		echo "Error, unable to find a service file in the Helm chart."
 # 		$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.noService"
-# 		exit 1
+# 		exit 3
 # 	fi
 
 # 	# Add the necessary labels and serviceaccount to the chart
@@ -158,15 +183,6 @@ function create() {
 
 # 	# Push app container image to docker registry if one is set up
 # 	if [[ ! -z $DEPLOYMENT_REGISTRY ]]; then
-
-# 		# If the image already exists, remove it as well.
-# 		# Fix for no nodemon in ICP.
-# 		if [ "$( docker images -q $project )" ]; then
-# 			docker rmi -f $project
-# 		fi
-# 		if [ "$( docker images -q $DEPLOYMENT_REGISTRY/$project )" ]; then
-# 			docker rmi -f $DEPLOYMENT_REGISTRY/$project
-# 		fi
 # 		# If there's an existing failed Helm release, delete it. See https://github.com/helm/helm/issues/3353
 # 		if [ "$( helm list $project --failed )" ]; then
 # 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
@@ -182,7 +198,7 @@ function create() {
 #  		$util newLogFileAvailable $PROJECT_ID "build"
 
 # 		echo -e "Docker build log file "$LOG_FOLDER/$DOCKER_BUILD.log""
-# 		docker build -t $project . |& tee "$LOG_FOLDER/$DOCKER_BUILD.log"
+# 		$IMAGE_COMMAND $BUILD_COMMAND -t $project . |& tee "$LOG_FOLDER/$DOCKER_BUILD.log"
 # 		exitCode=$?
 # 		imageLastBuild=$(($(date +%s)*1000))
 # 		if [ $exitCode -eq 0 ]; then
@@ -191,19 +207,19 @@ function create() {
 # 		else
 # 			echo "$BUILD_IMAGE_FAILED_MSG $projectName" >&2
 # 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.buildFail"
-# 			exit 1
+# 			exit 3
 # 		fi
 
 # 		# Tag and push the image to the registry
-# 		docker tag $project $DEPLOYMENT_REGISTRY/$project
-# 		docker push $DEPLOYMENT_REGISTRY/$project
+# 		$IMAGE_COMMAND push --tls-verify=false $project $DEPLOYMENT_REGISTRY/$project
 
 # 		if [ $? -eq 0 ]; then
 # 			echo "Successfully tagged and pushed the application image $DEPLOYMENT_REGISTRY/$project"
 # 		else
 # 			echo "Error: $?, could not push application image $DEPLOYMENT_REGISTRY/$project" >&2
 # 			$util deploymentRegistryStatus $PROJECT_ID "buildscripts.invalidDeploymentRegistry"
-# 			exit 1;
+# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.invalidDeploymentRegistry"
+# 			exit 3
 # 		fi
 
 # 		# Install the application using helm.
@@ -221,7 +237,7 @@ function create() {
 #  		$util newLogFileAvailable $PROJECT_ID "build"
 
 # 		echo -e "Docker build log file "$LOG_FOLDER/$DOCKER_BUILD.log""
-# 		docker build -t $project . |& tee "$LOG_FOLDER/$DOCKER_BUILD.log"
+# 		$IMAGE_COMMAND $BUILD_COMMAND -t $project . |& tee "$LOG_FOLDER/$DOCKER_BUILD.log"
 # 		exitCode=$?
 # 		imageLastBuild=$(($(date +%s)*1000))
 # 		if [ $exitCode -eq 0 ]; then
@@ -230,7 +246,7 @@ function create() {
 # 		else
 # 			echo "$BUILD_IMAGE_FAILED_MSG $projectName" >&2
 # 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.buildFail"
-# 			exit 1
+# 			exit 3
 # 		fi
 # 		helm upgrade \
 # 			--install $project \
@@ -245,7 +261,7 @@ function create() {
 # 	else
 # 		echo "Helm install failed for $projectName with exit code $?, exiting" >&2
 # 		$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.buildFail"
-# 		exit 1
+# 		exit 3
 # 	fi
 
 # 	# Wait until the pod is up and running
@@ -257,13 +273,14 @@ function create() {
 # 		elif [[ -z "$RESULT" || $RESULT = *"Failure"* || $RESULT = *"Unknown"* || $RESULT = *"ImagePullBackOff"* || $RESULT = *"CrashLoopBackOff"* ]]; then
 # 			echo "Error: Pod for Helm release $project failed to start" >&2
 # 			errorMsg="Error starting project $projectName: pod for helm release $project failed to start"  # :NLS
-# 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPED "$errorMsg"
 
 # 			# Print the Helm status before deleting the release
 # 			helm status $project
 
 # 			helm delete $project --purge
-# 			exit 1;
+
+# 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPED "$errorMsg"
+# 			exit 3
 # 		fi
 # 		sleep 1;
 # 	done
@@ -290,45 +307,20 @@ function create() {
 # 	heapdump="NODE_HEAPDUMP_OPTIONS=nosignal"
 
 # 	# Remove container if it already exists (could be from a failed attempt)
-# 	if [ "$(docker ps -aq -f name=$project)" ]; then
-# 		docker rm -f $project
+# 	if [ "$($IMAGE_COMMAND ps -aq -f name=$project)" ]; then
+# 		$IMAGE_COMMAND rm -f $project
 # 	fi
 
 # 	# If the node module volume for the project doesn't already exist, create it.
-# 	if [ ! "$(docker volume ls -q -f name=$project-nodemodules)" ]; then
-# 		docker volume create $project-nodemodules
+# 	if [ ! "$($IMAGE_COMMAND volume ls -q -f name=$project-nodemodules)" ]; then
+# 		$IMAGE_COMMAND volume create $project-nodemodules
 # 	fi
 
 # 	workspace=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
 # 	echo "Workspace path used for volume mounting is: "$workspace""
 
-# 	docker run --network=codewind_network -e $heapdump --name $project -p 127.0.0.1::$DEBUG_PORT -P -dt -v "$workspace/$projectName":/app -v $project-nodemodules:/app/node_modules $project /bin/bash -c "$dockerCmd";
+# 	$IMAGE_COMMAND run --network=codewind_network -e $heapdump --name $project -p 127.0.0.1::$DEBUG_PORT -P -dt -v "$workspace/$projectName":/app -v $project-nodemodules:/app/node_modules $project /bin/bash -c "$dockerCmd";
 # }
-
-function appsodyStop() {
-	$DIR/appsody stop --name $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
-}
-
-function appsodyStart() {
-
-	cmd=$START_MODE
-
-	if [ "$START_MODE" != "run" ]; then
-		cmd=debug
-	fi
-
-	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P |& tee -a $LOG_FOLDER/appsody.log &
-	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
-}
-
-function resetStates() {
-	# appsody projects don't really need to "build"
-	# $util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
-	imageLastBuild=$(($(date +%s)*1000))
-	$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
-
-	$util updateAppState $PROJECT_ID $APP_STATE_STARTING
-}
 
 function deployLocal() {
 	
@@ -412,7 +404,7 @@ elif [ "$COMMAND" == "update" ]; then
 		create
 	elif [ "$action" == "RESTART" ]; then
 	# 	if [ "$IN_K8" == "true" ]; then
-	# 		# Currently in ICP, changed files are only copied over through docker build
+	# 		# On Kubernetes, changed files are only copied over through docker build
 	# 		echo "Rebuilding project: $projectName"
 	# 		create
 	# 	else
@@ -424,7 +416,7 @@ elif [ "$COMMAND" == "update" ]; then
 	# 	fi
 	else
 	# 	if [ "$IN_K8" == "true" ]; then
-	# 		# No nodemon in ICP and changed files are only copied over through docker build
+	# 		# No nodemon on Kubernetes and changed files are only copied over through docker build
 	# 		echo "Rebuilding project: $projectName"
 	# 		create
 	# 	elif [ "$AUTO_BUILD_ENABLED" != "true" ]; then
@@ -436,12 +428,12 @@ elif [ "$COMMAND" == "update" ]; then
 	# 	fi
 	fi
 
-# Stop the application (not supported for ICP)
+# Stop the application (not supported on Kubernetes)
 elif [ "$COMMAND" == "stop" ]; then
 	echo "Stopping appsody project $projectName"
 	appsodyStop
 	$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-# Start the application (not supported for ICP)
+# Start the application (not supported on Kubernetes)
 elif [ "$COMMAND" == "start" ]; then
 	echo "Starting appsody project $projectName"
 	# Clear the cache since restarting node will pick up any changes to package.json or nodemon.json
@@ -453,17 +445,17 @@ elif [ "$COMMAND" == "enableautobuild" ]; then
 	echo "Enabling auto build for appsody project $projectName"
 	# Wipe out any changes to package.json or nodemon.json since restarting node will take care of them
 	# clearNodeCache
-	# docker exec $project /scripts/noderun.sh stop
+	# $IMAGE_COMMAND exec $project /scripts/noderun.sh stop
 	# $util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-	# docker exec $project /scripts/noderun.sh start true $START_MODE
+	# $IMAGE_COMMAND exec $project /scripts/noderun.sh start true $START_MODE
 	# $util updateAppState $PROJECT_ID $APP_STATE_STARTING
 	echo "Auto build for appsody project $projectName enabled"
 # Disable auto build
 elif [ "$COMMAND" == "disableautobuild" ]; then
 	echo "Disabling auto build for appsody project $projectName"
-	# docker exec $project /scripts/noderun.sh stop
+	# $IMAGE_COMMAND exec $project /scripts/noderun.sh stop
 	# $util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-	# docker exec $project /scripts/noderun.sh start false $START_MODE
+	# $IMAGE_COMMAND exec $project /scripts/noderun.sh start false $START_MODE
 	# $util updateAppState $PROJECT_ID $APP_STATE_STARTING
 	echo "Auto build for appsody project $projectName disabled"
 # Remove the application
@@ -472,32 +464,22 @@ elif [ "$COMMAND" == "remove" ]; then
 
 	# if [ "$IN_K8" == "true" ]; then
 	# 	helm delete $project --purge
-	# 	if [[ "$(kubectl get images $CONTAINER_NAME)" ]]; then
-	# 		kubectl delete image $CONTAINER_NAME --force --grace-period=0
-	# 	fi
 	# else
 		# Remove container
-		docker rm -f $project
+		$IMAGE_COMMAND rm -f $project
 
 		# Remove the node modules volume, as it needs to be deleted separately.
-		if [ "$(docker volume ls -q -f name=$project-nodemodules)" ]; then
-			docker volume rm $project-nodemodules
+		if [ "$($IMAGE_COMMAND volume ls -q -f name=$project-nodemodules)" ]; then
+			$IMAGE_COMMAND volume rm $project-nodemodules
 		fi
 	# fi
 
 	# Remove image
-	if [ "$(docker images -qa -f reference=$project)" ]; then
-		docker rmi -f $project
+	if [ "$($IMAGE_COMMAND images -qa -f reference=$project)" ]; then
+		$IMAGE_COMMAND rmi -f $project
 	else
 		echo The application image $project has already been removed.
 	fi
-
-	# Remove registry image and Kubernetes image
-	# if [ "$IN_K8" == "true" ]; then
-	# 	if [ "$( docker images -q $DEPLOYMENT_REGISTRY/$project )" ]; then
-	# 		docker rmi -f $DEPLOYMENT_REGISTRY/$project
-	# 	fi
-	# fi
 # Rebuild the application
 elif [ "$COMMAND" == "rebuild" ]; then
 	echo "Rebuilding project: $projectName"
