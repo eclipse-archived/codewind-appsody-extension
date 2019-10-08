@@ -70,7 +70,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
 
             // list of stacks start on 3rd line
-            exec(`${__dirname}/appsody list | tail -n+3`, (err, stdout) => {
+            exec(`${__dirname}/appsody list | tail -n+2`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
