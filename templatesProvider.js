@@ -92,7 +92,11 @@ module.exports = {
 
                     // split the line: <repo> <id> <version> <templates> (leave <description> for later)
                     const cols = line.substring(0, descStart).split(/\s+/);
-                    const repo = cols[0];
+                    let repo = cols[0];
+
+                    // chop of the default repo indicator if present
+                    if (repo.startsWith('*'))
+                        repo = repo.substring(1);
 
                     // check if it's a valid, non-experimental entry
                     if (cols.length < 4 || repo == 'experimental')
