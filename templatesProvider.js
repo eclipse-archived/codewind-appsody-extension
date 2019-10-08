@@ -68,9 +68,8 @@ module.exports = {
 
     getProjectTypes: async function() {
         return new Promise((resolve, reject) => {
-
-            // list of stacks start on 2nd line
-            exec(`${__dirname}/appsody list | tail -n+2`, (err, stdout) => {
+            
+            exec(`${__dirname}/appsody list`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
