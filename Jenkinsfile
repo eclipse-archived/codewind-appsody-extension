@@ -19,7 +19,10 @@ pipeline {
                         cd bin
                         ./pull.sh
                         cd ..
-                        zip $OUTPUT_NAME.zip -9 -r *
+                        rm -rf .git
+                        rm -rf .github
+                        rm .gitignore
+                        zip $OUTPUT_NAME.zip -9 -r ./
                     '''
                 }
             }
@@ -32,7 +35,7 @@ pipeline {
                   
                     sh '''
                         export REPO_NAME="codewind-appsody-extension"
-                        export OUTPUT_NAME="appsody-extension"
+                        export OUTPUT_NAME="codewind-appsody-extension"
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
