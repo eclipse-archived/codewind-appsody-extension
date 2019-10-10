@@ -22,6 +22,7 @@ pipeline {
                         rm -rf .git
                         rm -rf .github
                         rm .gitignore
+                        rm Jenkinsfile
                         zip $OUTPUT_NAME.zip -9 -r ./
                     '''
                 }
