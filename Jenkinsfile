@@ -14,7 +14,7 @@ pipeline {
                 script {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''
-                        export OUTPUT_NAME="appsody-extension"
+                        export OUTPUT_NAME="codewind-appsody-extension"
                         
                         cd bin
                         ./pull.sh
