@@ -21,7 +21,6 @@ pipeline {
                         cd ..
                         zip $OUTPUT_NAME.zip -9 -r *
                     '''
-                    }
                 }
             }
         } 
