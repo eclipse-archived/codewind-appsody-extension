@@ -8,10 +8,6 @@ pipeline {
         skipStagesAfterUnstable()
     }
 
-    parameters {
-        string(name: "CW_APPSODY_EXT_VERSION", defaultValue: "0.5.0", description: "codewind-appsody-extension version to be appended to the output zip file")
-    }
-
     stages {
         stage('Build') {
             steps {
@@ -19,13 +15,9 @@ pipeline {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
+                        export VERSION="0.5.0"
+                        export OUTPUT_NAME=$REPO_NAME-$VERSION
 
-                        echo "parameter : ${params.CW_APPSODY_EXT_VERSION}"
-
-                        export OUTPUT_NAME=$REPO_NAME-${params.CW_APPSODY_EXT_VERSION}
-
-                        echo "file name : ${OUTPUT_NAME}"
-                        
                         cd bin
                         ./pull.sh
                         cd ..
@@ -43,7 +35,8 @@ pipeline {
                   
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
-                        export OUTPUT_NAME=$REPO_NAME-${params.CW_APPSODY_EXT_VERSION}
+                        export VERSION="0.5.0"
+                        export OUTPUT_NAME=$REPO_NAME-$VERSION
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
