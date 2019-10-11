@@ -16,7 +16,7 @@ pipeline {
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
                         
-                        if [[ $GIT_BRANCH == "master" ]] || [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
+                        if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
                             export OUTPUT_NAME="$REPO_NAME-$GIT_BRANCH"
                         else
                             export OUTPUT_NAME="$REPO_NAME"
@@ -40,7 +40,7 @@ pipeline {
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
                         
-                        if [[ $GIT_BRANCH == "master" ]] || [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
+                        if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
                             export OUTPUT_NAME="$REPO_NAME-$GIT_BRANCH"
                         else 
                             export OUTPUT_NAME="$REPO_NAME"
