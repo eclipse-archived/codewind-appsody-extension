@@ -43,7 +43,7 @@ pipeline {
                         else 
                             export OUTPUT_NAME="codewind-appsody-extension"
                         fi 
-                        
+
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
