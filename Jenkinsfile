@@ -14,15 +14,16 @@ pipeline {
                 script {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''
-                        export OUTPUT_NAME="codewind-appsody-extension"
+                        if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
+                            export OUTPUT_NAME="codewind-appsody-extension-$GIT_BRANCH"
+                        else 
+                            export OUTPUT_NAME="codewind-appsody-extension"
+                        fi 
                         
                         cd bin
                         ./pull.sh
                         cd ..
-                        rm -rf .git
-                        rm -rf .github
-                        rm .gitignore
-                        rm Jenkinsfile
+                        rm -rf .git .github .gitignore Jenkinsfile
                         zip $OUTPUT_NAME.zip -9 -r ./
                     '''
                 }
@@ -36,7 +37,13 @@ pipeline {
                   
                     sh '''
                         export REPO_NAME="codewind-appsody-extension"
-                        export OUTPUT_NAME="codewind-appsody-extension"
+                        
+                        if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
+                            export OUTPUT_NAME="codewind-appsody-extension-$GIT_BRANCH"
+                        else 
+                            export OUTPUT_NAME="codewind-appsody-extension"
+                        fi 
+                        
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
@@ -44,8 +51,9 @@ pipeline {
                         export sshHost="genie.codewind@projects-storage.eclipse.org"
                         export deployDir="/home/data/httpd/download.eclipse.org/codewind/$REPO_NAME"
                     
-                        mkdir $mkdir $OUTPUT_DIR
+                        mkdir $OUTPUT_DIR
                         
+                        # if not a pull request build, copy it to 'latest' directory
                         if [ -z $CHANGE_ID ]; then
                             UPLOAD_DIR="$GIT_BRANCH/$BUILD_ID"
                             BUILD_URL="$DOWNLOAD_AREA_URL/$UPLOAD_DIR"
@@ -61,7 +69,6 @@ pipeline {
                             echo "build_info.SHA-1=${SHA1}" >> $BUILD_INFO
                             
                             scp $BUILD_INFO $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$BUILD_INFO
-                            
                             rm $BUILD_INFO
                         else
                             UPLOAD_DIR="pr/$CHANGE_ID/$BUILD_ID"
