@@ -13,12 +13,14 @@ pipeline {
             steps {
                 script {
                     println("Starting codewind-appsody-extension build ...")
-                    sh '''
+                    sh '''#!/usr/bin/env bash
+                        export REPO_NAME="codewind-appsody-extension"
+                        
                         if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
-                            export OUTPUT_NAME="codewind-appsody-extension-$GIT_BRANCH"
-                        else 
-                            export OUTPUT_NAME="codewind-appsody-extension"
-                        fi 
+                            export OUTPUT_NAME="$REPO_NAME-$GIT_BRANCH"
+                        else
+                            export OUTPUT_NAME="$REPO_NAME"
+                        fi
                         
                         cd bin
                         ./pull.sh
@@ -35,13 +37,13 @@ pipeline {
                 sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                     println("Deploying ccodewind-appsody-extension to downoad area...")
                   
-                    sh '''
+                    sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
                         
                         if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
-                            export OUTPUT_NAME="codewind-appsody-extension-$GIT_BRANCH"
+                            export OUTPUT_NAME="$REPO_NAME-$GIT_BRANCH"
                         else 
-                            export OUTPUT_NAME="codewind-appsody-extension"
+                            export OUTPUT_NAME="$REPO_NAME"
                         fi 
 
                         export OUTPUT_DIR="$WORKSPACE/output"
