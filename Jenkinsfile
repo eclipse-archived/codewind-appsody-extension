@@ -8,6 +8,10 @@ pipeline {
         skipStagesAfterUnstable()
     }
 
+    parameters {
+        string(name: "VERSION", defaultValue: "0.5.0", description: "codewind-appsody-extension version to be appended to the output zip file")
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -15,12 +19,7 @@ pipeline {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
-                        
-                        if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
-                            export OUTPUT_NAME="$REPO_NAME-$GIT_BRANCH"
-                        else
-                            export OUTPUT_NAME="$REPO_NAME"
-                        fi
+                        export OUTPUT_NAME="$REPO_NAME-${params.VERSION}"
                         
                         cd bin
                         ./pull.sh
@@ -39,13 +38,7 @@ pipeline {
                   
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
-                        
-                        if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
-                            export OUTPUT_NAME="$REPO_NAME-$GIT_BRANCH"
-                        else 
-                            export OUTPUT_NAME="$REPO_NAME"
-                        fi 
-
+                        export OUTPUT_NAME="$REPO_NAME-${params.VERSION}"
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
