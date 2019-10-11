@@ -19,7 +19,7 @@ pipeline {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
-                        export OUTPUT_NAME="$REPO_NAME-${params.VERSION}"
+                        export OUTPUT_NAME=$REPO_NAME-${params.VERSION}
                         
                         cd bin
                         ./pull.sh
@@ -38,7 +38,7 @@ pipeline {
                   
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
-                        export OUTPUT_NAME="$REPO_NAME-${params.VERSION}"
+                        export OUTPUT_NAME=$REPO_NAME-${params.VERSION}
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
