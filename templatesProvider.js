@@ -20,11 +20,7 @@ module.exports = {
 
     getRepositories: async function() {
         return new Promise((resolve, reject) => {
-
-            // not support on k8s at the moment, return empty list
-            if (global.codewind && global.codewind.RUNNING_IN_K8S)
-                return resolve([]);
-
+            
             // list of repositories start on 3rd line
             exec(`${__dirname}/appsody repo list | tail -n+3`, (err, stdout) => {
 
