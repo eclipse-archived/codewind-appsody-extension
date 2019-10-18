@@ -271,7 +271,7 @@ elif [ "$COMMAND" == "remove" ]; then
 	# else
 		# Remove container
 		$DIR/appsody stop --name $CONTAINER_NAME
-		sleep 3
+		sleep 5
 
 		if [ "$IN_K8" != "true" ]; then
 			# Remove the deps volume, as it needs to be deleted separately.
