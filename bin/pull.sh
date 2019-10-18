@@ -3,8 +3,8 @@
 set -e
 set -o pipefail
 
-default_appsody_version=0.4.6
-default_appsody_controller_version=0.2.4
+default_appsody_version=0.4.7
+default_appsody_controller_version=0.2.5
 
 appsody_version=${APPSODY_VERSION}
 appsody_controller_version=${APPSODY_CONTROLLER_VERSION}
