@@ -112,7 +112,7 @@ function resetStates() {
 	# $util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
 	imageLastBuild=$(($(date +%s)*1000))
 	$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
-
+	sleep 1
 	$util updateAppState $PROJECT_ID $APP_STATE_STARTING
 }
 
