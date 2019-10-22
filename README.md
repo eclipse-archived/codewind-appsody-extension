@@ -48,7 +48,6 @@ If you have a local install of the Appsody CLI, you can configure it to use the 
 ## Current Limitations
 
 - Enabling and disabling auto build in Codewind is not supported for Appsody projects.
-- Appsody is supported on Codewind on VS Code and on Eclipse, but not on Eclipse Che at this time.
 
 ## Contributing
 

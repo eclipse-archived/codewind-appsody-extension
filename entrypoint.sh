@@ -75,14 +75,17 @@ source /file-watcher/scripts/constants.sh
 echo project=$project
 cd "$ROOT" 2> /dev/null
 
-hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
-
 # Export some APPSODY env vars
 # export APPSODY_MOUNT_HOME=`$DIR/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
+if [ "$IN_K8" == "true" ]; then
+	export APPSODY_K8S_EXPERIMENTAL=TRUE
+	hostWorkspacePath="/$CHE_WORKSPACE_ID/projects"
+else
+	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
+fi
 export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/$EXT_NAME/bin/appsody-controller"
 export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
 
-echo APPSODY_MOUNT_HOME=$APPSODY_MOUNT_HOME
 echo APPSODY_MOUNT_CONTROLLER=$APPSODY_MOUNT_CONTROLLER
 echo APPSODY_MOUNT_PROJECT=$APPSODY_MOUNT_PROJECT
 
@@ -109,220 +112,21 @@ function resetStates() {
 	# $util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
 	imageLastBuild=$(($(date +%s)*1000))
 	$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
-
+	sleep 1
 	$util updateAppState $PROJECT_ID $APP_STATE_STARTING
 }
 
 function cleanContainer() {
-	# if [ "$IN_K8" != "true" ]; then
+	if [ "$IN_K8" != "true" ]; then
 		if [ "$($IMAGE_COMMAND ps -aq -f name=$project)" ]; then
 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
 			$IMAGE_COMMAND rm -f $project
-			$IMAGE_COMMAND rmi -f $project
+			# $IMAGE_COMMAND rmi -f $project
 		fi
-	# fi
+	fi
 }
 
 function create() {
-	# Run the project using either helm or docker run
-	# if [ "$IN_K8" == "true" ]; then
-	# 	deployK8s
-	# else
-		deployLocal
-	# fi
-}
-
-# function deployK8s() {
-# 	# Find the Helm chart folder, error out if it can't be found
-# 	if [[ -d "chart/$projectName" ]] && [[ -f "chart/$projectName/Chart.yaml" ]]; then
-# 		chartDir="chart/$projectName"
-# 	else
-# 		chartDir="$(find . -type f -name '*Chart.yaml*' | sed -r 's|/[^/]+$||' | sort | uniq | head -n1)"
-# 		if [[ ! -d "$chartDir" ]]; then
-# 			echo "Exiting, Unable to find the Helm chart for project $projectName"
-# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.noHelmChart"
-# 			exit 3
-# 		fi
-# 	fi
-# 	chartName=$( basename $chartDir )
-# 	tmpChart=/tmp/$projectName/$chartName
-
-# 	# Copy project chart dir to a tmp location for chart modify and helm install
-# 	echo "Copying chart dir $chartDir to $tmpChart"
-# 	if [[ -d $tmpChart ]]; then
-# 		rm -rf $tmpChart
-# 	fi
-# 	mkdir -p $tmpChart
-# 	cp -fR $chartDir/* $tmpChart
-# 	parentDir=$( dirname $tmpChart )
-
-# 	echo "Modifying charts and running Helm install from $chartDir"
-
-# 	# Render the template yamls for the chart
-# 	helm template $tmpChart \
-# 		--name $project \
-# 		--values=/file-watcher/scripts/override-values.yaml \
-# 		--set image.repository=$DEPLOYMENT_REGISTRY/$project \
-# 		--output-dir=$parentDir
-
-# 	deploymentFile=$( /file-watcher/scripts/kubeScripts/find-kube-resource.sh $tmpChart Deployment )
-# 	if [[ -z $deploymentFile ]]; then
-# 		echo "Error, unable to find a deployment file in the Helm chart."
-# 		$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.noDeployment"
-# 		exit 3
-# 	fi
-# 	serviceFile=$( /file-watcher/scripts/kubeScripts/find-kube-resource.sh $tmpChart Service )
-# 	if [[ -z $serviceFile ]]; then
-# 		echo "Error, unable to find a service file in the Helm chart."
-# 		$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.noService"
-# 		exit 3
-# 	fi
-
-# 	# Add the necessary labels and serviceaccount to the chart
-# 	/file-watcher/scripts/kubeScripts/modify-helm-chart.sh $deploymentFile $serviceFile $project
-
-# 	# Push app container image to docker registry if one is set up
-# 	if [[ ! -z $DEPLOYMENT_REGISTRY ]]; then
-# 		# If there's an existing failed Helm release, delete it. See https://github.com/helm/helm/issues/3353
-# 		if [ "$( helm list $project --failed )" ]; then
-# 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPING
-# 			helm delete $project --purge
-# 		fi
-
-# 		echo "$BUILD_IMAGE_INPROGRESS_MSG $projectName"
-# 		$util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
-
-# 		echo -e "Touching docker container build log file: "$LOG_FOLDER/$DOCKER_BUILD.log""
-# 		touch "$LOG_FOLDER/$DOCKER_BUILD.log"
-# 		echo -e "Triggering log file event for: docker container build log"
-#  		$util newLogFileAvailable $PROJECT_ID "build"
-
-# 		echo -e "Docker build log file "$LOG_FOLDER/$DOCKER_BUILD.log""
-# 		$IMAGE_COMMAND $BUILD_COMMAND -t $project . |& tee "$LOG_FOLDER/$DOCKER_BUILD.log"
-# 		exitCode=$?
-# 		imageLastBuild=$(($(date +%s)*1000))
-# 		if [ $exitCode -eq 0 ]; then
-# 			echo "Docker build successful for $projectName"
-# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
-# 		else
-# 			echo "$BUILD_IMAGE_FAILED_MSG $projectName" >&2
-# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.buildFail"
-# 			exit 3
-# 		fi
-
-# 		# Tag and push the image to the registry
-# 		$IMAGE_COMMAND push --tls-verify=false $project $DEPLOYMENT_REGISTRY/$project
-
-# 		if [ $? -eq 0 ]; then
-# 			echo "Successfully tagged and pushed the application image $DEPLOYMENT_REGISTRY/$project"
-# 		else
-# 			echo "Error: $?, could not push application image $DEPLOYMENT_REGISTRY/$project" >&2
-# 			$util deploymentRegistryStatus $PROJECT_ID "buildscripts.invalidDeploymentRegistry"
-# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.invalidDeploymentRegistry"
-# 			exit 3
-# 		fi
-
-# 		# Install the application using helm.
-# 		helm upgrade \
-# 			--install $project \
-# 			--recreate-pods \
-# 			$tmpChart;
-# 	else
-# 		echo "$BUILD_IMAGE_INPROGRESS_MSG $projectName"
-# 		$util updateBuildState $PROJECT_ID $BUILD_STATE_INPROGRESS "buildscripts.buildImage"
-
-# 		echo -e "Touching docker container build log file: "$LOG_FOLDER/$DOCKER_BUILD.log""
-# 		touch "$LOG_FOLDER/$DOCKER_BUILD.log"
-# 		echo -e "Triggering log file event for: docker container build log"
-#  		$util newLogFileAvailable $PROJECT_ID "build"
-
-# 		echo -e "Docker build log file "$LOG_FOLDER/$DOCKER_BUILD.log""
-# 		$IMAGE_COMMAND $BUILD_COMMAND -t $project . |& tee "$LOG_FOLDER/$DOCKER_BUILD.log"
-# 		exitCode=$?
-# 		imageLastBuild=$(($(date +%s)*1000))
-# 		if [ $exitCode -eq 0 ]; then
-# 			echo "Docker build successful for $projectName"
-# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " " "$imageLastBuild"
-# 		else
-# 			echo "$BUILD_IMAGE_FAILED_MSG $projectName" >&2
-# 			$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.buildFail"
-# 			exit 3
-# 		fi
-# 		helm upgrade \
-# 			--install $project \
-# 			--recreate-pods \
-# 			$tmpChart;
-# 	fi
-
-# 	if [ $? -eq 0 ]; then
-# 		echo "Helm install successful for $projectName"
-# 		$util updateBuildState $PROJECT_ID $BUILD_STATE_SUCCESS " "
-# 		$util updateAppState $PROJECT_ID $APP_STATE_STARTING
-# 	else
-# 		echo "Helm install failed for $projectName with exit code $?, exiting" >&2
-# 		$util updateBuildState $PROJECT_ID $BUILD_STATE_FAILED "buildscripts.buildFail"
-# 		exit 3
-# 	fi
-
-# 	# Wait until the pod is up and running
-# 	POD_RUNNING=0
-# 	while [ $POD_RUNNING -eq 0 ]; do
-# 		RESULT="$( kubectl get po --selector=release=$project )"
-# 		if [[ $RESULT = *"Running"* ]]; then
-# 			POD_RUNNING=1
-# 		elif [[ -z "$RESULT" || $RESULT = *"Failure"* || $RESULT = *"Unknown"* || $RESULT = *"ImagePullBackOff"* || $RESULT = *"CrashLoopBackOff"* ]]; then
-# 			echo "Error: Pod for Helm release $project failed to start" >&2
-# 			errorMsg="Error starting project $projectName: pod for helm release $project failed to start"  # :NLS
-
-# 			# Print the Helm status before deleting the release
-# 			helm status $project
-
-# 			helm delete $project --purge
-
-# 			$util updateAppState $PROJECT_ID $APP_STATE_STOPPED "$errorMsg"
-# 			exit 3
-# 		fi
-# 		sleep 1;
-# 	done
-
-# 	echo "The pod for helm release $project is now up"
-
-# 	# Delete any pods left that are terminating, to ensure they go away
-# 	/file-watcher/scripts/kubeScripts/clear-terminating-pods.sh $project
-
-# 	echo -e "Touching application log file: "$LOG_FOLDER/$APP_LOG.log""
-# 	touch "$LOG_FOLDER/$APP_LOG.log"
-# 	echo -e "Triggering log file event for: application log"
-#  	$util newLogFileAvailable $PROJECT_ID "app"
-
-# 	# add the app logs
-# 	echo -e "App log file "$LOG_FOLDER/$APP_LOG.log""
-# 	kubectl logs -f $(kubectl get po -o name --selector=release=$project) >> "$LOG_FOLDER/$APP_LOG.log" &
-# }
-
-# function dockerRun() {
-# 	# Map container to different port than the project is using
-# 	dockerCmd="tail -F /output/container.log 2>/dev/null"
-# 	# The NODE_HEAPDUMP_OPTIONS=nosignal environment variable is needed for nodemon to work due to the common use of SIGUSR2 between nodemon and appmetrics. See https://github.com/RuntimeTools/appmetrics/issues/517 for details
-# 	heapdump="NODE_HEAPDUMP_OPTIONS=nosignal"
-
-# 	# Remove container if it already exists (could be from a failed attempt)
-# 	if [ "$($IMAGE_COMMAND ps -aq -f name=$project)" ]; then
-# 		$IMAGE_COMMAND rm -f $project
-# 	fi
-
-# 	# If the node module volume for the project doesn't already exist, create it.
-# 	if [ ! "$($IMAGE_COMMAND volume ls -q -f name=$project-nodemodules)" ]; then
-# 		$IMAGE_COMMAND volume create $project-nodemodules
-# 	fi
-
-# 	workspace=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
-# 	echo "Workspace path used for volume mounting is: "$workspace""
-
-# 	$IMAGE_COMMAND run --network=codewind_network -e $heapdump --name $project -p 127.0.0.1::$DEBUG_PORT -P -dt -v "$workspace/$projectName":/app -v $project-nodemodules:/app/node_modules $project /bin/bash -c "$dockerCmd";
-# }
-
-function deployLocal() {
 	
 	echo "Appsody deploy for $projectName"
 
@@ -466,20 +270,23 @@ elif [ "$COMMAND" == "remove" ]; then
 	# 	helm delete $project --purge
 	# else
 		# Remove container
-		$IMAGE_COMMAND rm -f $project
+		$DIR/appsody stop --name $CONTAINER_NAME
+		sleep 5
 
-		# Remove the node modules volume, as it needs to be deleted separately.
-		if [ "$($IMAGE_COMMAND volume ls -q -f name=$project-nodemodules)" ]; then
-			$IMAGE_COMMAND volume rm $project-nodemodules
+		if [ "$IN_K8" != "true" ]; then
+			# Remove the deps volume, as it needs to be deleted separately.
+			if [ "$($IMAGE_COMMAND volume ls -q -f name=$projectName-deps)" ]; then
+				$IMAGE_COMMAND volume rm $projectName-deps
+			fi
 		fi
 	# fi
 
 	# Remove image
-	if [ "$($IMAGE_COMMAND images -qa -f reference=$project)" ]; then
-		$IMAGE_COMMAND rmi -f $project
-	else
-		echo The application image $project has already been removed.
-	fi
+	# if [ "$($IMAGE_COMMAND images -qa -f reference=$project)" ]; then
+	# 	$IMAGE_COMMAND rmi -f $project
+	# else
+	# 	echo The application image $project has already been removed.
+	# fi
 # Rebuild the application
 elif [ "$COMMAND" == "rebuild" ]; then
 	echo "Rebuilding project: $projectName"
