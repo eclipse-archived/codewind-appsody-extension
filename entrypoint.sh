@@ -505,6 +505,7 @@ elif [ "$COMMAND" == "rebuild" ]; then
 	create
 # Just return configuration information as last line of output
 else
-	knStack=`$DIR/scripts/get-stack.sh .appsody-config.yaml`
-	echo -n "{ \"language\": \"$knStack\" }"
+	stack=`grep "stack: " .appsody-config.yaml`
+	knStack=`$DIR/scripts/get-stack.sh "$stack"`
+	echo -n "{ \"language\": \"$knStack\" }" > $LOG_FOLDER/settings.json
 fi
