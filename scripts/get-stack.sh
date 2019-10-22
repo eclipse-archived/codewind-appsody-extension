@@ -12,16 +12,18 @@
 #
 ###################################################################################
 
-if grep --quiet "nodejs" $1; then
+stack=$1
+
+if [[ $stack =~ "nodejs" ]]; then
 	echo nodejs-default
-elif grep --quiet "liberty" $1; then
+elif [[ $stack =~ "liberty" ]]; then
 	echo java-default
-elif grep --quiet "spring" $1; then
+elif [[ $stack =~ "spring" ]]; then
 	echo java-spring
-elif grep --quiet "quarkus" $1; then
+elif [[ $stack =~ "quarkus" ]]; then
 	echo java-spring
-elif grep --quiet "java" $1; then
+elif [[ $stack =~ "java" ]]; then
 	echo java-default
-elif grep --quiet "python" $1; then
+elif [[ $stack =~ "python" ]]; then
 	echo python-default
 fi
