@@ -56,7 +56,7 @@ pipeline {
                             ssh $sshHost rm -rf $deployDir/$GIT_BRANCH/$LATEST_DIR
                             ssh $sshHost mkdir -p $deployDir/$GIT_BRANCH/$LATEST_DIR
                             
-                            scp $OUTPUT_NAME.zip $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$OUTPUT_NAME.zip
+                            scp ../$OUTPUT_NAME.zip $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$OUTPUT_NAME.zip
                         
                             echo "# Build date: $(date +%F-%T)" >> $BUILD_INFO
                             echo "build_info.url=$BUILD_URL" >> $BUILD_INFO
@@ -71,7 +71,7 @@ pipeline {
                         
                         ssh $sshHost rm -rf $deployDir/${UPLOAD_DIR}
                         ssh $sshHost mkdir -p $deployDir/${UPLOAD_DIR}
-                        scp $OUTPUT_NAME.zip $sshHost:$deployDir/${UPLOAD_DIR}
+                        scp ../$OUTPUT_NAME.zip $sshHost:$deployDir/${UPLOAD_DIR}
                     '''
                 }
             }
