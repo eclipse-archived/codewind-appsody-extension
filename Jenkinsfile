@@ -25,6 +25,9 @@ pipeline {
                         cd ..
                         mv $REPO_NAME $OUTPUT_NAME
                         zip $OUTPUT_NAME.zip -9 -r $OUTPUT_NAME
+                        # restore the repo directory
+                        mv $OUTPUT_NAME $REPO_NAME
+                        cd $REPO_NAME
                     '''
                 }
             }
