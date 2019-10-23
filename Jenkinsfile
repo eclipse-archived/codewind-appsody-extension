@@ -25,7 +25,7 @@ pipeline {
                         rm -rf .git .github .gitignore Jenkinsfile
                         mkdir $OUTPUT_NAME
                         # move everything inside output folder, suppress error about moving output folder inside itself
-                        mv * $OUTPUT_NAME 2> /dev/null
+                        mv * .* $OUTPUT_NAME 2> /dev/null
                         zip $OUTPUT_NAME.zip -9 -r $OUTPUT_NAME
                     '''
                 }
