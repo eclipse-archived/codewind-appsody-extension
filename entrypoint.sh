@@ -81,7 +81,7 @@ if [ "$IN_K8" == "true" ]; then
 	export APPSODY_K8S_EXPERIMENTAL=TRUE
 	hostWorkspacePath="/$CHE_WORKSPACE_ID/projects"
 else
-	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $LOCAL_WORKSPACE`
+	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $HOST_WORKSPACE_DIRECTORY`
 fi
 export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/$EXT_NAME/bin/appsody-controller"
 export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
