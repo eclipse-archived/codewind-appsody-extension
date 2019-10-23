@@ -16,3 +16,4 @@ commands:
 detection: .appsody-config.yaml
 config:
   containerAppRoot: /project/user-app
+  needsMount: true
