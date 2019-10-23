@@ -22,7 +22,9 @@ pipeline {
                         ./pull.sh
                         cd ..
                         rm -rf .git .github .gitignore Jenkinsfile
-                        zip $OUTPUT_NAME.zip -9 -r ./
+                        cd ..
+                        mv $REPO_NAME $OUTPUT_NAME
+                        zip $OUTPUT_NAME.zip -9 -r $OUTPUT_NAME
                     '''
                 }
             }
