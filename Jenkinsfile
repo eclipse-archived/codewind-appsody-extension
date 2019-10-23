@@ -14,6 +14,7 @@ pipeline {
                 script {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''#!/usr/bin/env bash
+                        export DIR=`pwd`
                         export REPO_NAME="codewind-appsody-extension"
                         export VERSION="0.6.0"
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
@@ -23,11 +24,11 @@ pipeline {
                         cd ..
                         rm -rf .git .github .gitignore Jenkinsfile
                         cd ..
-                        mv $REPO_NAME $OUTPUT_NAME
+                        mv $DIR $OUTPUT_NAME
                         zip $OUTPUT_NAME.zip -9 -r $OUTPUT_NAME
                         # restore the repo directory
-                        mv $OUTPUT_NAME $REPO_NAME
-                        cd $REPO_NAME
+                        mv $OUTPUT_NAME $DIR
+                        cd $DIR
                     '''
                 }
             }
