@@ -22,7 +22,12 @@ pipeline {
                         ./pull.sh
                         cd ..
                         rm -rf .git .github .gitignore Jenkinsfile
-                        zip $OUTPUT_NAME.zip -9 -r ./
+                        cd ..
+                        mv $REPO_NAME $OUTPUT_NAME
+                        zip $OUTPUT_NAME.zip -9 -r $OUTPUT_NAME
+                        # restore the repo directory
+                        mv $OUTPUT_NAME $REPO_NAME
+                        cd $REPO_NAME
                     '''
                 }
             }
@@ -54,7 +59,7 @@ pipeline {
                             ssh $sshHost rm -rf $deployDir/$GIT_BRANCH/$LATEST_DIR
                             ssh $sshHost mkdir -p $deployDir/$GIT_BRANCH/$LATEST_DIR
                             
-                            scp $OUTPUT_NAME.zip $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$OUTPUT_NAME.zip
+                            scp ../$OUTPUT_NAME.zip $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$OUTPUT_NAME.zip
                         
                             echo "# Build date: $(date +%F-%T)" >> $BUILD_INFO
                             echo "build_info.url=$BUILD_URL" >> $BUILD_INFO
@@ -69,7 +74,7 @@ pipeline {
                         
                         ssh $sshHost rm -rf $deployDir/${UPLOAD_DIR}
                         ssh $sshHost mkdir -p $deployDir/${UPLOAD_DIR}
-                        scp $OUTPUT_NAME.zip $sshHost:$deployDir/${UPLOAD_DIR}
+                        scp ../$OUTPUT_NAME.zip $sshHost:$deployDir/${UPLOAD_DIR}
                     '''
                 }
             }
