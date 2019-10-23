@@ -14,6 +14,7 @@ pipeline {
                 script {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''#!/usr/bin/env bash
+                        export DIR=`pwd`
                         export REPO_NAME="codewind-appsody-extension"
                         export VERSION="0.6.0"
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
