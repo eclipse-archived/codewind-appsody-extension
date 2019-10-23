@@ -14,7 +14,6 @@ pipeline {
                 script {
                     println("Starting codewind-appsody-extension build ...")
                     sh '''#!/usr/bin/env bash
-                        export DIR=`pwd`
                         export REPO_NAME="codewind-appsody-extension"
                         export VERSION="0.6.0"
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
@@ -23,12 +22,10 @@ pipeline {
                         ./pull.sh
                         cd ..
                         rm -rf .git .github .gitignore Jenkinsfile
-                        cd ..
-                        mv $DIR $OUTPUT_NAME
+                        mkdir $OUTPUT_NAME
+                        # move everything inside output folder, suppress error about moving output folder inside itself
+                        mv * $OUTPUT_NAME 2> /dev/null
                         zip $OUTPUT_NAME.zip -9 -r $OUTPUT_NAME
-                        # restore the repo directory
-                        mv $OUTPUT_NAME $DIR
-                        cd $DIR
                     '''
                 }
             }
@@ -37,7 +34,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-                    println("Deploying ccodewind-appsody-extension to downoad area...")
+                    println("Deploying codewind-appsody-extension to downoad area...")
                   
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
@@ -60,7 +57,7 @@ pipeline {
                             ssh $sshHost rm -rf $deployDir/$GIT_BRANCH/$LATEST_DIR
                             ssh $sshHost mkdir -p $deployDir/$GIT_BRANCH/$LATEST_DIR
                             
-                            scp ../$OUTPUT_NAME.zip $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$OUTPUT_NAME.zip
+                            scp $OUTPUT_NAME.zip $sshHost:$deployDir/$GIT_BRANCH/$LATEST_DIR/$OUTPUT_NAME.zip
                         
                             echo "# Build date: $(date +%F-%T)" >> $BUILD_INFO
                             echo "build_info.url=$BUILD_URL" >> $BUILD_INFO
@@ -75,7 +72,7 @@ pipeline {
                         
                         ssh $sshHost rm -rf $deployDir/${UPLOAD_DIR}
                         ssh $sshHost mkdir -p $deployDir/${UPLOAD_DIR}
-                        scp ../$OUTPUT_NAME.zip $sshHost:$deployDir/${UPLOAD_DIR}
+                        scp $OUTPUT_NAME.zip $sshHost:$deployDir/${UPLOAD_DIR}
                     '''
                 }
             }
