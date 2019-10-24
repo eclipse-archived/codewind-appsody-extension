@@ -13,6 +13,19 @@ commands:
       - init
       - $subtype
       - none
+  - name: postRepositoryAdd
+    command: appsody
+    args:
+      - repo
+      - add
+      - $name
+      - $url
+  - name: postRepositoryRemove
+    command: appsody
+    args:
+      - repo
+      - remove
+      - $name
 detection: .appsody-config.yaml
 config:
   containerAppRoot: /project/user-app
