@@ -21,41 +21,30 @@ module.exports = {
     getRepositories: async function() {
         return new Promise((resolve, reject) => {
             
-            // list of repositories start on 3rd line
-            exec(`${__dirname}/appsody repo list | tail -n+3`, (err, stdout) => {
+            exec(`${__dirname}/appsody repo list -o json`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
 
                 const repos = [];
+                const json = JSON.parse(stdout);
 
-                stdout.split(os.EOL).forEach((line) => {
+                for (const repo of json.repositories) {
 
-                    // split the line: <name> <url>
-                    const pair = line.trim().split(/\s+/);
-                    
-                    // appsody uses index.yaml, change that to index.json
-                    if (pair.length >= 2) {
-                    
-                        let name = pair[0];
+                    const name = repo.name;
+                    let url = repo.url;
 
-                        // chop of the default repo indicator if present
-                        if (name.startsWith('*'))
-                            name = name.substring(1);
+                    if (name != 'experimental' && url.endsWith('index.yaml')) {
 
-                        if (name != 'experimental' && pair[1].endsWith('index.yaml')) {
+                        url = url.substring(0, url.length - 10) + 'index.json';
 
-                            let url = pair[1];
-                            url = url.substring(0, url.length - 10) + 'index.json';
-
-                            repos.push({
-                                name: `Appsody Stacks - ${name}`,
-                                description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
-                                url: url
-                            });
-                        }
+                        repos.push({
+                            name: `Appsody Stacks - ${name}`,
+                            description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
+                            url
+                        });
                     }
-                });
+                }
 
                 resolve(repos);
             });
