@@ -54,52 +54,34 @@ module.exports = {
     getProjectTypes: async function() {
         return new Promise((resolve, reject) => {
             
-            exec(`${__dirname}/appsody list`, (err, stdout) => {
+            exec(`${__dirname}/appsody list -o json`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
 
                 const projectTypes = [];
-                let descStart;
+                const json = JSON.parse(stdout);
 
-                for (const line of stdout.split(os.EOL)) {
-                    
-                    // found header line, note where the description starts
-                    if (line.startsWith('REPO')) {
-                        descStart = line.indexOf('DESCRIPTION');
+                for (const repo of json.repositories) {
+
+                    if (repo.repositoryName == 'experimental')
                         continue;
+
+                    for (const stack of repo.stacks) {
+
+                        projectTypes.push({
+                            projectType: 'appsodyExtension',
+                            projectSubtypes: {
+                                label: 'Appsody stack',
+                                items: [{
+                                    id: `${repo.repositoryName}/${stack.id}`,
+                                    version: stack.version,
+                                    label: `Appsody ${stack.id}`,
+                                    description: stack.description
+                                }]
+                            }
+                        });
                     }
-
-                    // haven't found the header line yet
-                    if (!descStart)
-                        continue;
-
-                    // split the line: <repo> <id> <version> <templates> (leave <description> for later)
-                    const cols = line.substring(0, descStart).split(/\s+/);
-                    let repo = cols[0];
-
-                    // chop of the default repo indicator if present
-                    if (repo.startsWith('*'))
-                        repo = repo.substring(1);
-
-                    // check if it's a valid, non-experimental entry
-                    if (cols.length < 4 || repo == 'experimental')
-                        continue;
-
-                    const stack = cols[1];
-
-                    projectTypes.push({
-                        projectType: 'appsodyExtension',
-                        projectSubtypes: {
-                            label: 'Appsody stack',
-                            items: [{
-                                id: `${repo}/${stack}`,
-                                version: cols[2],
-                                label: `Appsody ${stack}`,
-                                description: line.substring(descStart).trimRight()
-                            }]
-                        }
-                    });
                 }
 
                 resolve(projectTypes);
