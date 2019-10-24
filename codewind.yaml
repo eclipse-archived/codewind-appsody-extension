@@ -18,15 +18,16 @@ commands:
     args:
       - repo
       - add
-      - $name
+      - $id
       - $url
   - name: postRepositoryRemove
     command: appsody
     args:
       - repo
       - remove
-      - $name
+      - $id
 detection: .appsody-config.yaml
 config:
   containerAppRoot: /project/user-app
   needsMount: true
+  style: Appsody
