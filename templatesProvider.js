@@ -13,80 +13,96 @@
 
 'use strict';
 
-const { exec } = require('child_process');
-const os = require('os');
+const { promisify } = require('util');
+const exec = promisify(require('child_process').exec);
+
+function canHandle(repository) {
+    return repository.id && 
+        Array.isArray(repository.projectStyles) &&
+        repository.projectStyles.includes('Appsody');
+}
 
 module.exports = {
 
+    addRepository: async function(repository) {
+        
+        // no-op
+        if (!canHandle(repository) || 
+            !repository.url.endsWith('index.json'))
+            return;
+
+        let url = repository.url;
+        url = url.substring(0, url.length - 10) + 'index.yaml';
+
+        await exec(`${__dirname}/appsody repo add ${repository.id} ${url}`);
+    },
+
+    removeRepository: async function(repository) {
+        
+        // no-op
+        if (!canHandle(repository))
+            return;
+
+        await exec(`${__dirname}/appsody repo remove ${repository.id}`);
+    },
+
     getRepositories: async function() {
-        return new Promise((resolve, reject) => {
+        
+        const repos = [];
             
-            exec(`${__dirname}/appsody repo list -o json`, (err, stdout) => {
+        const result = await exec(`${__dirname}/appsody repo list -o json`);
+        const json = JSON.parse(result.stdout);
 
-                if (err)
-                    return reject(err);
+        for (const repo of json.repositories) {
 
-                const repos = [];
-                const json = JSON.parse(stdout);
+            const name = repo.name;
+            let url = repo.url;
 
-                for (const repo of json.repositories) {
+            if (name != 'experimental' && url.endsWith('index.yaml')) {
 
-                    const name = repo.name;
-                    let url = repo.url;
+                url = url.substring(0, url.length - 10) + 'index.json';
 
-                    if (name != 'experimental' && url.endsWith('index.yaml')) {
+                repos.push({
+                    id: name,
+                    name: `Appsody Stacks - ${name}`,
+                    description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
+                    url
+                });
+            }
+        }
 
-                        url = url.substring(0, url.length - 10) + 'index.json';
-
-                        repos.push({
-                            id: name,
-                            name: `Appsody Stacks - ${name}`,
-                            description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
-                            url
-                        });
-                    }
-                }
-
-                resolve(repos);
-            });
-        });
+        return repos;
     },
 
     getProjectTypes: async function() {
-        return new Promise((resolve, reject) => {
-            
-            exec(`${__dirname}/appsody list -o json`, (err, stdout) => {
 
-                if (err)
-                    return reject(err);
+        const projectTypes = [];
 
-                const projectTypes = [];
-                const json = JSON.parse(stdout);
+        const result = await exec(`${__dirname}/appsody list -o json`);
+        const json = JSON.parse(result.stdout);
 
-                for (const repo of json.repositories) {
+        for (const repo of json.repositories) {
 
-                    if (repo.repositoryName == 'experimental')
-                        continue;
+            if (repo.repositoryName == 'experimental')
+                continue;
 
-                    for (const stack of repo.stacks) {
+            for (const stack of repo.stacks) {
 
-                        projectTypes.push({
-                            projectType: 'appsodyExtension',
-                            projectSubtypes: {
-                                label: 'Appsody stack',
-                                items: [{
-                                    id: `${repo.repositoryName}/${stack.id}`,
-                                    version: stack.version,
-                                    label: `Appsody ${stack.id}`,
-                                    description: stack.description
-                                }]
-                            }
-                        });
+                projectTypes.push({
+                    projectType: 'appsodyExtension',
+                    projectSubtypes: {
+                        label: 'Appsody stack',
+                        items: [{
+                            id: `${repo.repositoryName}/${stack.id}`,
+                            version: stack.version,
+                            label: `Appsody ${stack.id}`,
+                            description: stack.description
+                        }]
                     }
-                }
+                });
+            }
+        }
 
-                resolve(projectTypes);
-            });
-        });
+        return projectTypes;
     }
 }
