@@ -21,41 +21,30 @@ module.exports = {
     getRepositories: async function() {
         return new Promise((resolve, reject) => {
             
-            // list of repositories start on 3rd line
-            exec(`${__dirname}/appsody repo list | tail -n+3`, (err, stdout) => {
+            exec(`${__dirname}/appsody repo list -o json`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
 
                 const repos = [];
+                const json = JSON.parse(stdout);
 
-                stdout.split(os.EOL).forEach((line) => {
+                for (const repo of json.repositories) {
 
-                    // split the line: <name> <url>
-                    const pair = line.trim().split(/\s+/);
-                    
-                    // appsody uses index.yaml, change that to index.json
-                    if (pair.length >= 2) {
-                    
-                        let name = pair[0];
+                    const name = repo.name;
+                    let url = repo.url;
 
-                        // chop of the default repo indicator if present
-                        if (name.startsWith('*'))
-                            name = name.substring(1);
+                    if (name != 'experimental' && url.endsWith('index.yaml')) {
 
-                        if (name != 'experimental' && pair[1].endsWith('index.yaml')) {
+                        url = url.substring(0, url.length - 10) + 'index.json';
 
-                            let url = pair[1];
-                            url = url.substring(0, url.length - 10) + 'index.json';
-
-                            repos.push({
-                                name: `Appsody Stacks - ${name}`,
-                                description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
-                                url: url
-                            });
-                        }
+                        repos.push({
+                            name: `Appsody Stacks - ${name}`,
+                            description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
+                            url
+                        });
                     }
-                });
+                }
 
                 resolve(repos);
             });
@@ -65,52 +54,34 @@ module.exports = {
     getProjectTypes: async function() {
         return new Promise((resolve, reject) => {
             
-            exec(`${__dirname}/appsody list`, (err, stdout) => {
+            exec(`${__dirname}/appsody list -o json`, (err, stdout) => {
 
                 if (err)
                     return reject(err);
 
                 const projectTypes = [];
-                let descStart;
+                const json = JSON.parse(stdout);
 
-                for (const line of stdout.split(os.EOL)) {
-                    
-                    // found header line, note where the description starts
-                    if (line.startsWith('REPO')) {
-                        descStart = line.indexOf('DESCRIPTION');
+                for (const repo of json.repositories) {
+
+                    if (repo.repositoryName == 'experimental')
                         continue;
+
+                    for (const stack of repo.stacks) {
+
+                        projectTypes.push({
+                            projectType: 'appsodyExtension',
+                            projectSubtypes: {
+                                label: 'Appsody stack',
+                                items: [{
+                                    id: `${repo.repositoryName}/${stack.id}`,
+                                    version: stack.version,
+                                    label: `Appsody ${stack.id}`,
+                                    description: stack.description
+                                }]
+                            }
+                        });
                     }
-
-                    // haven't found the header line yet
-                    if (!descStart)
-                        continue;
-
-                    // split the line: <repo> <id> <version> <templates> (leave <description> for later)
-                    const cols = line.substring(0, descStart).split(/\s+/);
-                    let repo = cols[0];
-
-                    // chop of the default repo indicator if present
-                    if (repo.startsWith('*'))
-                        repo = repo.substring(1);
-
-                    // check if it's a valid, non-experimental entry
-                    if (cols.length < 4 || repo == 'experimental')
-                        continue;
-
-                    const stack = cols[1];
-
-                    projectTypes.push({
-                        projectType: 'appsodyExtension',
-                        projectSubtypes: {
-                            label: 'Appsody stack',
-                            items: [{
-                                id: `${repo}/${stack}`,
-                                version: cols[2],
-                                label: `Appsody ${stack}`,
-                                description: line.substring(descStart).trimRight()
-                            }]
-                        }
-                    });
                 }
 
                 resolve(projectTypes);
