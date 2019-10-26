@@ -106,3 +106,12 @@ module.exports = {
         return projectTypes;
     }
 }
+
+// remove experimental repo on load
+module.exports.removeRepository({
+    id: 'experimental',
+    projectStyles: ['Appsody']
+})
+.catch((err) => {
+    console.warn(err.message);
+});
