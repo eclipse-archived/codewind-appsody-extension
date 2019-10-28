@@ -74,7 +74,7 @@ module.exports = {
         return repos;
     },
 
-    getProjectTypes: async function() {
+    getProjectTypes: async function(id) {
 
         const projectTypes = [];
 
