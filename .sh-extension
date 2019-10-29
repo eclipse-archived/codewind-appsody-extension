@@ -1,9 +1,13 @@
 {
     "requiredFiles": [],
-    "buildLogs": [],
-    "appLogs": [
-        "appsody"
-    ],
+    "appWorkspaceLogs": {
+        "files": {
+            "appsody": null
+        }
+    },
+    "appContainerLogs": {},
+    "buildWorkspaceLogs": {},
+    "buildContainerLogs": {},
     "appPort": {
         "nodejs-default": "3000",
         "java-default": "9080",
