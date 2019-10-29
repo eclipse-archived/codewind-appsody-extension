@@ -7,7 +7,7 @@ This repository is an extension to Codewind that adds support for [Appsody](http
 
 ## Installing the Appsody Extension on Codewind
 
-Download the latest [release](https://github.com/eclipse/codewind-appsody-extension/releases) and unzip or untar it under the Codewind workspace's `.extensions` folder, i.e.
+Download the desired build from [Eclipse Downloads](https://download.eclipse.org/codewind/codewind-appsody-extension/) and unzip the archive under the Codewind workspace's `.extensions` folder, i.e.
 
 `/some_path/codewind-workspace/.extensions/codewind-appsody-extension`
 
@@ -34,16 +34,6 @@ After installing the Appsody extension, the Appsody project templates will becom
 4. Run the command below. A docker image of the application will be built with the name *projectName*.
 
    `/codewind-workspace/.extensions/codewind-appsody-extension/appsody build`
-
-## Optional: Using the Same Appsody Configuration Between Local CLI and Codewind
-
-If you have a local install of the Appsody CLI, you can configure it to use the same configuration as Codewind.
-
-1. Open the `.appsody.yaml` configuration file that the Appsody CLI is using in an editor (by default, this file is located in your home directory, under the `.appsody` folder, but this can be changed via Appsody's [`--config`](https://appsody.dev/docs/using-appsody/cli-commands) flag)
-
-2. Change the `home` property to point the Codewind's copy of the Appsody configuration
-
-   `home: /some_path/codewind-workspace/.appsody`
 
 ## Current Limitations
 
