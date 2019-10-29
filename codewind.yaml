@@ -13,14 +13,14 @@ commands:
       - init
       - $subtype
       - none
- - name: postRepositoryAdd
+ - name: onRepositoryAdd
     command: appsody
     args:
       - repo
       - add
       - $id
       - $url
-  - name: postRepositoryRemove
+  - name: onRepositoryDelete
     command: appsody
     args:
       - repo
