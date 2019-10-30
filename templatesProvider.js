@@ -16,19 +16,16 @@
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 
-function canHandle(repository) {
-    return repository.id && 
-        Array.isArray(repository.projectStyles) &&
-        repository.projectStyles.includes('Appsody');
-}
-
 module.exports = {
 
+    canHandle: function(repository) {
+        return repository.projectStyles.includes('Appsody');
+    },
+    
     addRepository: async function(repository) {
         
         // no-op
-        if (!canHandle(repository) || 
-            !repository.url.endsWith('index.json'))
+        if (!repository.url.endsWith('index.json'))
             return;
 
         let url = repository.url;
@@ -38,11 +35,6 @@ module.exports = {
     },
 
     removeRepository: async function(repository) {
-        
-        // no-op
-        if (!canHandle(repository))
-            return;
-
         await exec(`${__dirname}/appsody repo remove ${repository.id}`);
     },
 
