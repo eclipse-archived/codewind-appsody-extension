@@ -19,7 +19,9 @@ const exec = promisify(require('child_process').exec);
 module.exports = {
 
     canHandle: function(repository) {
-        return repository.projectStyles.includes('Appsody');
+        return repository.id &&
+            Array.isArray(repository.projectStyles) && 
+            repository.projectStyles.includes('Appsody');
     },
     
     addRepository: async function(repository) {
