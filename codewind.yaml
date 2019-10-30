@@ -20,7 +20,7 @@ commands:
       - add
       - $id
       - $url,.yaml
-  - name: onRepositoryDelete
+  - name: onRepositoryRemove
     command: appsody
     args:
       - repo
