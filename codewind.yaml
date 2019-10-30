@@ -13,13 +13,13 @@ commands:
       - init
       - $subtype
       - none
- - name: onRepositoryAdd
+  - name: onRepositoryAdd
     command: appsody
     args:
       - repo
       - add
       - $id
-      - $url
+      - $url,.yaml
   - name: onRepositoryDelete
     command: appsody
     args:
