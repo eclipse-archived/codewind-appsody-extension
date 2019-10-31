@@ -1,6 +1,7 @@
 # codewind-appsody-extension
 
-[![License](https://img.shields.io/badge/license-Eclipse-brightgreen.svg)](https://www.eclipse.org/legal/epl-2.0/)
+[![License](https://img.shields.io/badge/License-EPL%202.0-red.svg?label=license&logo=eclipse)](https://www.eclipse.org/legal/epl-2.0/)
+[![Build Status](https://ci.eclipse.org/codewind/buildStatus/icon?job=Codewind%2Fcodewind-appsody-extension%2Fmaster)](https://ci.eclipse.org/codewind/job/Codewind/job/codewind-appsody-extension/job/master/)
 [![Chat](https://img.shields.io/static/v1.svg?label=chat&message=mattermost&color=145dbf)](https://mattermost.eclipse.org/eclipse/channels/eclipse-codewind)
 
 This repository is an extension to Codewind that adds support for [Appsody](https://appsody.dev) projects.
