@@ -294,6 +294,15 @@ elif [ "$COMMAND" == "rebuild" ]; then
 	create
 # Just return configuration information as last line of output
 else
+	# a temporary workaround until controller mount is no longer needed
+	if [ "$IN_K8" != "true" ]; then
+		tempBin="/mounted-workspace/.extensions/$EXT_NAME/bin"
+		if [ ! -f "$tempBin/appsody-controller" ]; then
+			mkdir -p $tempBin
+			cp "$DIR/bin/appsody-controller" $tempBin
+		fi
+	fi
+
 	stack=`grep "stack: " .appsody-config.yaml`
 	knStack=`$DIR/scripts/get-stack.sh "$stack"`
 	echo -n "{ \"language\": \"$knStack\" }" > $LOG_FOLDER/settings.json
