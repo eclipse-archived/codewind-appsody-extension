@@ -72,14 +72,11 @@ module.exports = {
 
         const projectTypes = [];
 
-        const result = await exec(`${__dirname}/appsody list -o json`);
+        const result = await exec(`${__dirname}/appsody list ${id} -o json`);
         const json = JSON.parse(result.stdout);
 
         for (const repo of json.repositories) {
-
-            if (repo.repositoryName == 'experimental')
-                continue;
-
+            
             for (const stack of repo.stacks) {
 
                 projectTypes.push({
