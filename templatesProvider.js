@@ -43,26 +43,32 @@ module.exports = {
     getRepositories: async function() {
         
         const repos = [];
-            
-        const result = await exec(`${__dirname}/appsody repo list -o json`);
-        const json = JSON.parse(result.stdout);
+        
+        try {
+            const result = await exec(`${__dirname}/appsody repo list -o json`);
+            const json = JSON.parse(result.stdout);
 
-        for (const repo of json.repositories) {
+            for (const repo of json.repositories) {
 
-            const name = repo.name;
-            let url = repo.url;
+                const name = repo.name;
+                let url = repo.url;
 
-            if (name != 'experimental' && url.endsWith('index.yaml')) {
+                if (name != 'experimental' && url.endsWith('index.yaml')) {
 
-                url = url.substring(0, url.length - 10) + 'index.json';
+                    url = url.substring(0, url.length - 10) + 'index.json';
 
-                repos.push({
-                    id: name,
-                    name: `Appsody Stacks - ${name}`,
-                    description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
-                    url
-                });
+                    repos.push({
+                        id: name,
+                        name: `Appsody Stacks - ${name}`,
+                        description: 'Use Appsody in Codewind to develop applications with sharable technology stacks.',
+                        url
+                    });
+                }
             }
+        }
+        catch (err) {
+            console.error('Appsody extension: failed to retrieve repositories');
+            console.error(err.message);
         }
 
         return repos;
@@ -72,26 +78,32 @@ module.exports = {
 
         const projectTypes = [];
 
-        const result = await exec(`${__dirname}/appsody list ${id} -o json`);
-        const json = JSON.parse(result.stdout);
+        try {
+            const result = await exec(`${__dirname}/appsody list ${id} -o json`);
+            const json = JSON.parse(result.stdout);
 
-        for (const repo of json.repositories) {
-            
-            for (const stack of repo.stacks) {
+            for (const repo of json.repositories) {
+                
+                for (const stack of repo.stacks) {
 
-                projectTypes.push({
-                    projectType: 'appsodyExtension',
-                    projectSubtypes: {
-                        label: 'Appsody stack',
-                        items: [{
-                            id: `${repo.repositoryName}/${stack.id}`,
-                            version: stack.version,
-                            label: `Appsody ${stack.id}`,
-                            description: stack.description
-                        }]
-                    }
-                });
+                    projectTypes.push({
+                        projectType: 'appsodyExtension',
+                        projectSubtypes: {
+                            label: 'Appsody stack',
+                            items: [{
+                                id: `${repo.repositoryName}/${stack.id}`,
+                                version: stack.version,
+                                label: `Appsody ${stack.id}`,
+                                description: stack.description
+                            }]
+                        }
+                    });
+                }
             }
+        }
+        catch (err) {
+            console.error('Appsody extension: failed to retrieve project types');
+            console.error(err.message);
         }
 
         return projectTypes;
