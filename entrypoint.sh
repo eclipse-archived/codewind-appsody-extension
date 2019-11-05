@@ -79,6 +79,12 @@ cd "$ROOT" 2> /dev/null
 # export APPSODY_MOUNT_HOME=`$DIR/scripts/get-home.sh | xargs $util getWorkspacePathForVolumeMounting`
 if [ "$IN_K8" == "true" ]; then
 	export APPSODY_K8S_EXPERIMENTAL=TRUE
+	export CODEWIND_PROJECT_ID=$PROJECT_ID
+	
+	source $DIR/scripts/export-self.sh
+	echo CODEWIND_OWNER_NAME=$CODEWIND_OWNER_NAME
+	echo CODEWIND_OWNER_UID=$CODEWIND_OWNER_UID
+
 	hostWorkspacePath="/$CHE_WORKSPACE_ID/projects"
 else
 	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $HOST_WORKSPACE_DIRECTORY`
