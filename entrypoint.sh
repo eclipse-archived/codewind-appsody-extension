@@ -87,6 +87,14 @@ if [ "$IN_K8" == "true" ]; then
 
 	hostWorkspacePath="/$CHE_WORKSPACE_ID/projects"
 else
+	# a temporary workaround until controller mount is no longer needed	
+	tempBin="/mounted-workspace/.extensions/$EXT_NAME/bin"
+	if [ ! -f "$tempBin/appsody-controller" ]; then
+		rm -rf $tempBin
+		mkdir -p $tempBin
+		cp "$DIR/bin/appsody-controller" $tempBin
+	fi
+
 	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $HOST_WORKSPACE_DIRECTORY`
 fi
 export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/$EXT_NAME/bin/appsody-controller"
@@ -300,15 +308,6 @@ elif [ "$COMMAND" == "rebuild" ]; then
 	create
 # Just return configuration information as last line of output
 else
-	# a temporary workaround until controller mount is no longer needed
-	if [ "$IN_K8" != "true" ]; then
-		tempBin="/mounted-workspace/.extensions/$EXT_NAME/bin"
-		if [ ! -f "$tempBin/appsody-controller" ]; then
-			mkdir -p $tempBin
-			cp "$DIR/bin/appsody-controller" $tempBin
-		fi
-	fi
-
 	stack=`grep "stack: " .appsody-config.yaml`
 	knStack=`$DIR/scripts/get-stack.sh "$stack"`
 	echo -n "{ \"language\": \"$knStack\" }" > $LOG_FOLDER/settings.json
