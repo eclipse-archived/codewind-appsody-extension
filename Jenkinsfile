@@ -16,7 +16,7 @@ pipeline {
                     sh '''#!/usr/bin/env bash
                         export DIR=`pwd`
                         export REPO_NAME="codewind-appsody-extension"
-                        export VERSION="0.6.0"
+                        export VERSION="0.7.0"
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
 
                         cd bin
@@ -39,7 +39,7 @@ pipeline {
                   
                     sh '''#!/usr/bin/env bash
                         export REPO_NAME="codewind-appsody-extension"
-                        export VERSION="0.6.0"
+                        export VERSION="0.7.0"
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
                         export OUTPUT_DIR="$WORKSPACE/output"
                         export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
