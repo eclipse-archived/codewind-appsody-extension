@@ -26,4 +26,6 @@ elif [[ $stack =~ "java" ]]; then
 	echo java-default
 elif [[ $stack =~ "python" ]]; then
 	echo python-default
+elif [[ $stack =~ "kitura" ]]; then
+	echo swift-default
 fi
