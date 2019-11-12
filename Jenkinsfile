@@ -16,7 +16,11 @@ pipeline {
                     sh '''#!/usr/bin/env bash
                         export DIR=`pwd`
                         export REPO_NAME="codewind-appsody-extension"
-                        export VERSION="0.7.0"
+                        if [ $GIT_BRANCH == "master" ]; then
+                            export VERSION="9.9.9999"
+                        else
+                            export VERSION="$GIT_BRANCH"
+                        fi
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
 
                         cd bin
