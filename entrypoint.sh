@@ -87,20 +87,10 @@ if [ "$IN_K8" == "true" ]; then
 
 	hostWorkspacePath="/$CHE_WORKSPACE_ID/projects"
 else
-	# a temporary workaround until controller mount is no longer needed	
-	tempBin="/mounted-workspace/.extensions/$EXT_NAME/bin"
-	if [ ! -f "$tempBin/appsody-controller" ]; then
-		rm -rf $tempBin
-		mkdir -p $tempBin
-		cp "$DIR/bin/appsody-controller" $tempBin
-	fi
-
 	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $HOST_WORKSPACE_DIRECTORY`
 fi
-export APPSODY_MOUNT_CONTROLLER="$hostWorkspacePath/.extensions/$EXT_NAME/bin/appsody-controller"
-export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
 
-echo APPSODY_MOUNT_CONTROLLER=$APPSODY_MOUNT_CONTROLLER
+export APPSODY_MOUNT_PROJECT="$hostWorkspacePath/$projectName"
 echo APPSODY_MOUNT_PROJECT=$APPSODY_MOUNT_PROJECT
 
 set -o pipefail
