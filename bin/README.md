@@ -2,4 +2,4 @@
 
 This Codewind Appsody extension includes the following releases of the Appsody executables:
 
-- Appsody: [0.5.0](https://github.com/appsody/appsody/releases/tag/0.5.0)
+- Appsody: [0.5.1](https://github.com/appsody/appsody/releases/tag/0.5.1)
