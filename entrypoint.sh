@@ -107,7 +107,11 @@ function appsodyStart() {
 		cmd=debug
 	fi
 
-	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P |& tee -a $LOG_FOLDER/appsody.log &
+	if [ -f "env.list" ]; then
+		dopts=--docker-options=--env-file="env.list"
+	fi
+
+	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P $dopts |& tee -a $LOG_FOLDER/appsody.log &
 	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
 }
 
