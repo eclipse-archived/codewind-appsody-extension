@@ -1,5 +1,6 @@
 {
     "requiredFiles": [],
+    "rebuildTriggers": [ "env.list" ],
     "appWorkspaceLogs": {
         "files": {
             "appsody": null
