@@ -108,7 +108,7 @@ function appsodyStart() {
 	fi
 
 	if [ -f "env.list" ]; then
-		dopts=--docker-options=--env-file="env.list"
+		dopts=--docker-options="--env-file=env.list"
 	fi
 
 	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P $dopts |& tee -a $LOG_FOLDER/appsody.log &
