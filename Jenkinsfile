@@ -10,14 +10,6 @@ pipeline {
 
     stages {
         stage('Build') {
-            // This when clause disables Tagged build
-            when {
-                beforeAgent true
-                not {
-                    buildingTag()
-                }
-            }
-            
             steps {
                 script {
                     println("Starting codewind-appsody-extension build ...")
@@ -45,14 +37,6 @@ pipeline {
         } 
         
         stage('Deploy') {
-            // This when clause disables Tagged build
-            when {
-                beforeAgent true
-                not {
-                    buildingTag()
-                }
-            }
-            
             steps {
                 sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
                     println("Deploying codewind-appsody-extension to downoad area...")
