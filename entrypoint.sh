@@ -107,8 +107,8 @@ function appsodyStart() {
 		cmd=debug
 	fi
 
-	if [ -f "env.list" ]; then
-		dopts=--docker-options="--env-file=env.list"
+	if [ -f "env.properties" ]; then
+		dopts=--docker-options="--env-file=env.properties"
 	fi
 
 	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P $dopts |& tee -a $LOG_FOLDER/appsody.log &
