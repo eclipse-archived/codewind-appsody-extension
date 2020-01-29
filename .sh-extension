@@ -24,7 +24,7 @@
     "capabilities": {
         "startModes": [ 
             "run",
-            "debugNoInit"
+            "debug"
         ],
         "controlCommands": [
             "restart"
