@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-default_appsody_version=0.5.4
+default_appsody_version=0.5.7
 
 appsody_version=${APPSODY_VERSION}
 
