@@ -87,7 +87,7 @@ if [ "$IN_K8" == "true" ]; then
 
 	hostWorkspacePath="/$CHE_WORKSPACE_ID/projects"
 else
-	export APPSODY_MOUNT_HOME=$projectName-cwdeps:
+	export APPSODY_MOUNT_HOME=$projectName-cwdeps
 	hostWorkspacePath=`$util getWorkspacePathForVolumeMounting $HOST_WORKSPACE_DIRECTORY`
 fi
 
@@ -284,9 +284,7 @@ elif [ "$COMMAND" == "remove" ]; then
 
 		if [ "$IN_K8" != "true" ]; then
 			# Remove the deps volume, as it needs to be deleted separately.
-			if [ "$($IMAGE_COMMAND volume ls -q -f name=$projectName-deps -f name=$projectName-cwdeps)" ]; then
-				$IMAGE_COMMAND volume rm -f $projectName-deps $projectName-cwdeps
-			fi
+			$IMAGE_COMMAND volume ls -q -f name=$projectName-deps -f name=$projectName-cwdeps | xargs $IMAGE_COMMAND volume rm
 		fi
 	# fi
 
