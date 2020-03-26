@@ -284,7 +284,7 @@ elif [ "$COMMAND" == "remove" ]; then
 
 		if [ "$IN_K8" != "true" ]; then
 			# Remove the deps volume, as it needs to be deleted separately.
-			$IMAGE_COMMAND volume ls -q -f name=$projectName-deps -f name=$projectName-cwdeps | xargs $IMAGE_COMMAND volume rm 2> /dev/null || true 
+			$IMAGE_COMMAND volume ls -q -f name=$projectName- | xargs $IMAGE_COMMAND volume rm 2> /dev/null || true
 		fi
 	# fi
 
