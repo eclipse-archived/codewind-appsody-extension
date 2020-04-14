@@ -109,12 +109,12 @@ function appsodyStart() {
 		cmd=debug
 	fi
 
-	ENV_PROPERTIES_FILE=env.properties
+	ENV_PROPERTIES_FILE="$ROOT/env.properties"
 	PROJECT_LINKS_ENV_FILE="$ROOT/.codewind-project-links.env"
 	dopts=""
 	if [ -f "$ENV_PROPERTIES_FILE" ] && [ -f "$PROJECT_LINKS_ENV_FILE" ]; then
 		# if both files exist, merge them to resolve problem with docker-options
-		TEMP_ENV_FILE="/temp_env_file.env"
+		TEMP_ENV_FILE="$ROOT/.codewind-merged-env-files.env"
 		cat $ENV_PROPERTIES_FILE > $TEMP_ENV_FILE
 		cat $PROJECT_LINKS_ENV_FILE >> $TEMP_ENV_FILE
 		dopts=--docker-options="--env-file=$TEMP_ENV_FILE"
