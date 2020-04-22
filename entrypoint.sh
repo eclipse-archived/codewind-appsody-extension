@@ -109,8 +109,19 @@ function appsodyStart() {
 		cmd=debug
 	fi
 
-	if [ -f "env.properties" ]; then
-		dopts=--docker-options="--env-file=env.properties"
+	ENV_PROPERTIES_FILE="$ROOT/env.properties"
+	PROJECT_LINKS_ENV_FILE="$ROOT/.codewind-project-links.env"
+	dopts=""
+	if [ -f "$ENV_PROPERTIES_FILE" ] && [ -f "$PROJECT_LINKS_ENV_FILE" ]; then
+		# if both files exist, merge them to resolve problem with docker-options
+		TEMP_ENV_FILE="$ROOT/.codewind-merged-env-files.env"
+		cat $ENV_PROPERTIES_FILE > $TEMP_ENV_FILE
+		cat $PROJECT_LINKS_ENV_FILE >> $TEMP_ENV_FILE
+		dopts=--docker-options="--env-file=$TEMP_ENV_FILE"
+	elif [ -f "$ENV_PROPERTIES_FILE" ]; then
+		dopts=--docker-options="--env-file=$ENV_PROPERTIES_FILE"
+	elif [ -f "$PROJECT_LINKS_ENV_FILE" ]; then
+		dopts=--docker-options="--env-file=$PROJECT_LINKS_ENV_FILE"
 	fi
 
 	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P $dopts |& tee -a $LOG_FOLDER/appsody.log &
