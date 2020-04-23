@@ -50,11 +50,11 @@ pipeline {
                         fi
                         export OUTPUT_NAME="$REPO_NAME-$VERSION"
                         export OUTPUT_DIR="$WORKSPACE/output"
-                        export DOWNLOAD_AREA_URL="https://download.eclipse.org/codewind/$REPO_NAME"
+                        export DOWNLOAD_AREA_URL="https://archive.eclipse.org/codewind/$REPO_NAME"
                         export LATEST_DIR="latest"
                         export BUILD_INFO="build_info.properties"
                         export sshHost="genie.codewind@projects-storage.eclipse.org"
-                        export deployDir="/home/data/httpd/download.eclipse.org/codewind/$REPO_NAME"
+                        export deployDir="/home/data/httpd/archive.eclipse.org/codewind/$REPO_NAME"
                     
                         mkdir $OUTPUT_DIR
                         

@@ -8,7 +8,7 @@ This repository is an extension to Codewind that adds support for [Appsody](http
 
 ## Installing the Appsody Extension on Codewind
 
-Download the desired build from [Eclipse Downloads](https://download.eclipse.org/codewind/codewind-appsody-extension/) and unzip the archive under the Codewind workspace's `.extensions` folder, i.e.
+Download the desired build from [Eclipse Downloads](https://archive.eclipse.org/codewind/codewind-appsody-extension/) and unzip the archive under the Codewind workspace's `.extensions` folder, i.e.
 
 `/some_path/codewind-workspace/.extensions/codewind-appsody-extension`
 
