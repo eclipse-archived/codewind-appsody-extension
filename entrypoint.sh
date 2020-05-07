@@ -112,20 +112,27 @@ function appsodyStart() {
 	ENV_PROPERTIES_FILE="$ROOT/env.properties"
 	PROJECT_LINKS_ENV_FILE="$ROOT/.codewind-project-links.env"
 	dopts=""
-	if [ -f "$ENV_PROPERTIES_FILE" ] && [ -f "$PROJECT_LINKS_ENV_FILE" ]; then
-		# if both files exist, merge them to resolve problem with docker-options
+	if [ -f "$ENV_PROPERTIES_FILE" ]; then
+
 		TEMP_ENV_FILE="$ROOT/.codewind-merged-env-files.env"
 		cat $ENV_PROPERTIES_FILE > $TEMP_ENV_FILE
-		cat $PROJECT_LINKS_ENV_FILE >> $TEMP_ENV_FILE
+
+		# if links file also exists
+		if [ -f "$PROJECT_LINKS_ENV_FILE" ]; then
+			cat $PROJECT_LINKS_ENV_FILE >> $TEMP_ENV_FILE
+		fi
+
 		dopts=--docker-options="--env-file=$TEMP_ENV_FILE"
-	elif [ -f "$ENV_PROPERTIES_FILE" ]; then
-		dopts=--docker-options="--env-file=$ENV_PROPERTIES_FILE"
+
+		# check for additional networks
+		CW_NETWORKS=($(grep "^CW_NETWORKS=" $ENV_PROPERTIES_FILE | cut -d= -f2 | tr -d '"'))
+
 	elif [ -f "$PROJECT_LINKS_ENV_FILE" ]; then
 		dopts=--docker-options="--env-file=$PROJECT_LINKS_ENV_FILE"
 	fi
 
 	$DIR/appsody $cmd --name $CONTAINER_NAME --network codewind_network -P $dopts |& tee -a $LOG_FOLDER/appsody.log &
-	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME |& tee -a $LOG_FOLDER/appsody.log
+	$DIR/scripts/wait-for-container.sh $CONTAINER_NAME ${CW_NETWORKS[@]} |& tee -a $LOG_FOLDER/appsody.log
 }
 
 function resetStates() {

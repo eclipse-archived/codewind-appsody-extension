@@ -13,6 +13,7 @@
 ###################################################################################
 
 CONTAINER_NAME=$1
+shift
 COUNT=0
 
 # wait until container exists (20 mins max)
@@ -23,5 +24,12 @@ if [ "$IN_K8" == "true" ]; then
 else
 	until [ "$(docker ps -aq -f name=$CONTAINER_NAME)" -o $((COUNT++)) -eq 40 ]; do
 		sleep 30;
+	done
+
+	# connect additional docker networks
+	for network in $@
+	do
+		echo "Connecting $CONTAINER_NAME to the $network network"
+        docker network connect $network $CONTAINER_NAME
 	done
 fi
