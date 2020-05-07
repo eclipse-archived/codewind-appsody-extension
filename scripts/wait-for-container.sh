@@ -30,6 +30,6 @@ else
 	for network in $@
 	do
 		echo "Connecting $CONTAINER_NAME to the $network network"
-        docker network connect $network $CONTAINER_NAME
+		docker network connect $network $CONTAINER_NAME
 	done
 fi
